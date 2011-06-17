@@ -1,0 +1,59 @@
+
+<div  id="app">
+    <div class="title">
+        <h1>Listing pos</h1>
+    </div>
+    <div class="content">
+        <div id="create-po"></div>
+        <div id="pos">
+            <ul id="po-list"></ul>
+        </div>
+    </div>
+</div>
+
+
+<table>
+  <tr>
+    <th>Needed</th>
+    <th>Vendor</th>
+    <th>User</th>
+    <th>Approved</th>
+    <th>Confirmed</th>
+    <th>Amount</th>
+    <th>Paid</th>
+    <th></th>
+    <th></th>
+    <th></th>
+  </tr>
+
+<% @pos.each do |po| %>
+  <tr>
+    <td><%= po.needed %></td>
+    <td><%= po.vendor_id %></td>
+    <td><%= User.find(po.user_id).email %></td>
+    <td><% if po.approved.blank? %>
+        Not yet approved
+        <% else %>
+        <%= User.find(po.approved).email %>
+        <% end %>
+        </td>
+    <td>
+        <% if po.confirmed.blank? %>
+        Not yet confirmed
+        <% else %>
+        <%= User.find(po.confirmed).email %>
+       <% end  %>
+
+    </td>
+    <td><%= po.amount %></td>
+    <td><%= po.paid %></td>
+    <td><%= link_to 'Show', po %></td>
+    <td><%= link_to 'Edit', edit_po_path(po) %></td>
+    <td><%= link_to 'Destroy', po, :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New Po', new_po_path %>

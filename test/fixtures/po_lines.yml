@@ -1,0 +1,11 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  gl: 1
+  amount: 1.5
+  po: 
+
+two:
+  gl: 1
+  amount: 1.5
+  po: 

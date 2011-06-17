@@ -1,0 +1,40 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>Needed:</b>
+  <%= @po.needed %>
+</p>
+
+<p>
+  <b>Vendor:</b>
+  <%= @po.vendor_id %>
+</p>
+
+<p>
+  <b>User:</b>
+  <%= @po.user_id %>
+</p>
+
+<p>
+  <b>Approved:</b>
+  <%= @po.approved %>
+</p>
+
+<p>
+  <b>Confirmed:</b>
+  <%= @po.confirmed %>
+</p>
+
+<p>
+  <b>Amount:</b>
+  <%= @po.amount %>
+</p>
+
+<p>
+  <b>Paid:</b>
+  <%= @po.paid %>
+</p>
+
+
+<%= link_to 'Edit', edit_po_path(@po) %> |
+<%= link_to 'Back', pos_path %>

@@ -1,0 +1,44 @@
+<%= form_for(@po) do |f| %>
+  <% if @po.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@po.errors.count, "error") %> prohibited this po from being saved:</h2>
+
+      <ul>
+      <% @po.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :needed %><br />
+    <%= f.date_select :needed %>
+  </div>
+  <div class="field">
+    <%= f.label :vendor_id %><br />
+    <%= f.text_field :vendor_id %>
+  </div>
+  <div class="field">
+    <%= f.label :approved %><br />
+    <%= f.text_field :approved %>
+  </div>
+  <div class="field">
+    <%= f.label :confirmed %><br />
+    <%= f.text_field :confirmed %>
+  </div>
+  <div class="field">
+    <%= f.label :amount %><br />
+    <%= f.text_field :amount %>
+  </div>
+  <div class="field">
+    <%= f.label :paid %><br />
+    <%= f.date_select :paid %>
+  </div>
+  <div>
+    <%= hidden_field_tag(:user_id, current_user.id) %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

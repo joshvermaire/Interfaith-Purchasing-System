@@ -1,0 +1,7 @@
+javascripts:
+  interfaith:
+    - public/javascripts/jquery-min.js
+    - public/javascripts/underscore-min.js
+    - public/javascripts/backbone-min.js
+    - public/javascripts/backbone.js
+    - app/views/pos/*.jst
