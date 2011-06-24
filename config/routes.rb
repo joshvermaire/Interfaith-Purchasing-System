@@ -3,6 +3,7 @@ Interfaith::Application.routes.draw do
 
   devise_for :users
   resources :pos
+  resources :vendors
 
   # The priority is based upon order of creation:
   # first created -> highest priority.

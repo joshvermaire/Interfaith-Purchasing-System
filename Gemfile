@@ -8,6 +8,7 @@ gem 'rails', '3.0.7'
 gem 'sqlite3'
 gem 'jammit'
 gem 'devise'
+gem 'cancan'
 
 # Use unicorn as the web server
 # gem 'unicorn'

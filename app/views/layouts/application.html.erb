@@ -5,6 +5,11 @@
   <%= stylesheet_link_tag :all %>
   <%= include_javascripts :interfaith %>
   <%= csrf_meta_tag %>
+<% if current_user %>
+<script>
+var interfaith = {"user_id": <%= current_user.id %>};
+</script>  
+<% end %>
 
 </head>
 <body>
@@ -19,6 +24,5 @@
   <% end %>
 </div>
 <%= yield %>
-
 </body>
 </html>

@@ -5,7 +5,9 @@ class PosController < ApplicationController
   # GET /pos.xml
   def index
     @pos = Po.all
-    respond_with @pos
+
+    #respond_with current_user.id
+    respond_with @pos.to_json(:include => :vendor)
   end
 
   # GET /pos/1
