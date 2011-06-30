@@ -13,16 +13,69 @@ var interfaith = {"user_id": <%= current_user.id %>};
 
 </head>
 <body>
-<p class="notice"><%= notice %></p>
-<p class="alert"><%= alert %></p>
-<div id="user_nav">
-  <% if user_signed_in? %>
-    Signed in as <%= current_user.email %>. Not you?
-    <%= link_to "Sign out", destroy_user_session_path %>
-  <% else %>
-    <%= link_to "Sign up", new_user_registration_path %> or <%= link_to "sign in", new_user_session_path %>
-  <% end %>
-</div>
-<%= yield %>
+  <div id="app">
+    <p class="notice"><%= notice %></p>
+    <p class="alert"><%= alert %></p>
+    <% if !current_user %>
+    <div id="sign_in_over" style="width: 100%; height: 100%; position: absolute; background: rgba(17,17,17,.7); z-index: 2; display:none">
+      <div id="sign_in_form" style="z-index: 3; color: black; font-size: 20px; position: relative; margin: 0 auto; width: 400px; top: 0;  background:red; right: -400; float: right; height: 100%;">
+      <input id="signinemail" type="text" placeholder="Email Address" autocomplete="off" />
+      <br/>
+      <input id="signinpw" type="password" placeholder="Password" autocomplete="off"/>
+      <br/>
+      <input type="checkbox" name="remember_me" />Remember me
+      <div id="signinlogin">Sign In</div>
+      </div>
+      </div>
+    <% end %>
+    <div id="top" class="cf">
+      <div class="top-header">
+        <h4><a href="/#!/">Interfaith</a></h4>
+      
+        <ul>
+          <% if user_signed_in? %>
+            <li>Signed in as <%= current_user.email %>. Not you?</li>
+            <%= link_to "Sign out", destroy_user_session_path %>
+          <% else %>
+            <li id="sign_up">Sign Up</li><li id="sign_in">Sign In</li>
+          <% end %>
+        </ul>
+
+      </div>
+      <div class="nav">
+        <ul>
+        <li><a href="#!/po">POs</a></li>
+        <li><a href="#!/vendor">Vendors</a></li>
+        </ul>
+        <ul class="header-right"></ul>
+      </div>
+    </div>
+    <div id="middle" class="cf">
+      <div class="left">
+        <h5 class="side-header">Accounting</h5>
+        <ul id="sidebar-list">
+        <li><a href="#!/po">POs</a></li>
+        <li><a href="#!/vendor">Vendors</a></li>
+        </ul>
+      </div>
+      <div class="right">
+          <h5 class="side-header">Welcome!</h5>
+          <div id="sub-right">
+          <div id="welcome">
+            <p>I'm sure some information will go here</p>
+            <p>Photos, maybe a video? I don't know if we'll have enough time</p>
+          </div>
+          <div id="vendor">
+            <ul id="resource-list"></ul>
+          </div>
+          <div id="po">
+            <ul id="resource-list"></ul>
+          </div>
+        </div>
+      
+      </div>
+    </div>
+    <div id="bottom"></div>
+  </div>
 </body>
 </html>

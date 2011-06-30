@@ -1,14 +1,14 @@
-<div class="resource">
+<div class="resource resource-<%= type %>">
     <div class="resource-content">
     	<form>
 		    <label for='name'>Title</label>
 		    <input id="search" name='name' type='text' autocomplete="off" />
 		    
-		    <button>Create</button>
+		    <div id="vendor-submit">Create</div>
 		</form>
 
 
     </div>
     <div class="resource-results"></div>
-    <div class="cancel">Go Back</div>
+    <div><a href="/#!/">Go Back</a></div>
 </div>

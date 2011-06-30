@@ -1,0 +1,229 @@
+html {
+	height: 100%;
+    overflow-y: hidden;
+}
+
+body {
+	border: medium none;
+    height: 100%;
+    margin: 0;
+    overflow-y: hidden;
+    padding: 0;
+    position: relative;
+    font-family: 'Droid Sans',Helvetica,arial,sans-serif;
+    font-size: 12px;
+}
+
+/* Misc classes */
+.hidden {
+	display:none;
+}
+
+.fr {
+	float: right;
+}
+
+.fl {
+	float: left;
+}
+
+.cf:before,
+.cf:after {
+    content:"";
+    display:table;
+}
+
+.cf:after {
+    clear:both;
+}
+
+/* Start CSS */
+#app, #top, #middle, #bottom {
+    min-width: 960px;
+}
+
+#top {
+	bottom: auto;
+    display: block;
+    height: 80px;
+    left: 0;
+    margin: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+    visibility: visible;
+    width: auto;
+    z-index: 1;
+}
+
+.top-header {
+background-color: #F6F6F6;
+background-image: -moz-linear-gradient(90deg,#C3C3C3,#F6F6F6);
+background-image: -webkit-gradient(linear,0%0%,0%100%,from(#F6F6F6), to(#C3C3C3));
+color: #5F5F5F;
+filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#F6F6F6',endColorstr='#C3C3C3',GradientType=0);
+height: 28px;
+line-height: 28px;
+padding: 0 10px;
+text-shadow: -1px 1px 0 #F0F0F0;
+}
+
+.top-header h4 {
+float: left;
+font-weight: 400;
+color: #7A7A7A;
+text-shadow: -1px 1px 0 #D9D9D9;
+text-transform: capitalize;
+}
+
+.top-header ul {
+float: right;
+}
+
+.top-header h4 a {
+color: #7A7A7A;
+text-decoration: none;
+}
+
+.top-header ul li:first-child {
+border-left: none;
+padding: 0 15px 0 0;
+}
+
+.top-header ul li {
+float: left;
+padding: 0;
+height: 28px;
+}
+
+.top-header ul li:last-child, .nav ul li:last-child {
+border-right: none;
+}
+
+.nav {
+background-color: #363636;
+background-image: -moz-linear-gradient(90deg,#161616,#363636);
+background-image: -webkit-gradient(linear,0%0%,0%100%,from(#363636), to(#161616));
+filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#363636',endColorstr='#161616',GradientType=0);
+height: 52px;
+}
+
+.nav ul.header-right {
+	float: right;
+}
+
+.nav ul li {
+	font-size: 16px;
+	color: #D3D6D7;
+	line-height: 52px;
+	height: 52px;
+	float:left;
+	padding: 0 10px;
+}
+
+#middle {
+	position: absolute;
+	margin: 0px;
+	visibility: visible;
+	display: block;
+	overflow: hidden;
+	z-index: 1;
+	top: 80px;
+	bottom: 37px;
+	left: 0px;
+	right: 0px;
+}
+
+#middle .left {
+	position: absolute;
+	margin: 0px;
+	right: auto;
+	z-index: 1;
+	left: 0px;
+	visibility: visible;
+	display: block;
+	min-width: 247px;
+	background: #D3D6D7;
+	top: 0px;
+	bottom: 0px;
+	border-right: 1px solid darkGray;
+
+}
+
+.side-header {
+	background-color: #F1F1F1;
+	background-image: -moz-linear-gradient(90deg,#D8D8D8,#F1F1F1);
+	background-image: -webkit-gradient(linear,0%0%,0%100%,from(#F1F1F1), to(#D8D8D8));
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#F1F1F1',endColorstr='#D8D8D8',GradientType=0);
+	color: dimGray;
+	font-weight: 400;
+	height: 18px;
+	line-height: 18px;
+	text-align: left;
+	text-shadow: 0 1px 0 #F1F1F1;
+	text-transform: uppercase;
+	padding: 0 8px;
+}
+
+#middle .left ul li {
+	color: #222222;
+    display: block;
+    font-size: 16px;
+    height: 32px;
+    line-height: 32px;
+    padding: 0 20px;
+}
+
+#middle .right {
+	position: absolute;
+	margin: 0px;
+	z-index: 1;
+	visibility: visible;
+	display: block;
+	top: 0px;
+	bottom: 0px;
+	left: 248px;
+	right: 0px;
+}
+
+#middle .right > div {
+	margin: 0 8px;
+}
+
+#middle .right .side-header {
+	text-transform: none;
+	font-weight: 700;
+	color: #111;
+}
+
+#bottom {
+	position: absolute;
+	margin: 0px;
+	top: auto;
+	width: auto;
+	bottom: 0px;
+	left: 0px;
+	right: 0px;
+	height: 37px;
+	visibility: visible;
+	display: block;
+	z-index: 1;
+
+	background: #303030;
+	background-image: -moz-linear-gradient(90deg,#111,#303030);
+	background-image: -webkit-gradient(linear,0%0%,0%100%,from(#303030), to(#111));
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#323232',endColorstr='#111',GradientType=0);
+	height: 37px;
+
+	color: #7A7A7A;
+    text-decoration: none;
+}
+
+#bottom ul li a {
+	height: 37px;
+	line-height: 37px;
+	float:left;
+	margin-right: 10px;
+	padding: 0 10px;
+	text-decoration: none;
+}

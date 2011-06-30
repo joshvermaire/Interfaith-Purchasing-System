@@ -1,5 +1,5 @@
 class PosController < ApplicationController
-  before_filter :authenticate_user!, :except => [:show, :index]
+  before_filter :authenticate_user!, :except => [:show, :index, :create, :destroy]
   respond_to :json
   # GET /pos
   # GET /pos.xml
@@ -40,17 +40,8 @@ class PosController < ApplicationController
   # POST /pos
   # POST /pos.xml
   def create
-    @po = Po.new(params[:po])
-
-    respond_to do |format|
-      if @po.save
-        format.html { redirect_to(@po, :notice => 'Po was successfully created.') }
-        format.xml  { render :xml => @po, :status => :created, :location => @po }
-      else
-        format.html { render :action => "new" }
-        format.xml  { render :xml => @po.errors, :status => :unprocessable_entity }
-      end
-    end
+    @po = Po.create! params
+    respond_with @po
   end
 
   # PUT /pos/1
@@ -74,10 +65,6 @@ class PosController < ApplicationController
   def destroy
     @po = Po.find(params[:id])
     @po.destroy
-
-    respond_to do |format|
-      format.html { redirect_to(pos_url) }
-      format.xml  { head :ok }
-    end
+    respond_with @po
   end
 end
