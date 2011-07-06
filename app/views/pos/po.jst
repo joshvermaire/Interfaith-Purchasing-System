@@ -1,6 +1,9 @@
-<div class="po">
-  <div class="display">
-    <div class="po-content">PO for <%= vendor.name %> in the amount of <%= amount %></div>
-    <span class="po-destroy"></span>
-  </div>
+<div id="po">
+	<div class="po-vendor"><a href="/#!/vendor/<%= vendor_id %>"><%= vendor.name %></a></div>
+	<div class="po-date"><%= needed %></div>
+	<div class="po-user"><%= user.email %></div>
+	<div class="po-amount"><%= amount %></div>
+
+	<a href="/#po/<%= id %>">PO</a>
+	<span class="po-destroy"></span>
 </div>

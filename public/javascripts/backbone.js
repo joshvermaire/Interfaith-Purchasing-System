@@ -2,7 +2,12 @@ $(function() {
 
     // Set up current models
     Po = Backbone.Model.extend({
-        template: "po"
+        template: "po",
+        url: function() {
+            var base = 'pos';
+            if (this.isNew()) return base;
+            return base + (base.charAt(base.length - 1) == '/' ? '' : '/') + this.id;
+        }
     });
     User = Backbone.Model.extend();
     Vendor = Backbone.Model.extend({
@@ -36,9 +41,9 @@ $(function() {
     });
 
     // Create collections 
-    var Pos = new PoList;
-    var Users = new UserList;
-    var Vendors = new VendorList;
+    Pos = new PoList;
+    Users = new UserList;
+    Vendors = new VendorList;
 
 
     ResourceView = Backbone.View.extend({
@@ -47,15 +52,26 @@ $(function() {
           _.bindAll(this, 'render');
         },
 
+        events: {
+            "click .po-vendor"   : "vendor"
+        },
+
         tagName: "li",
 
         render: function() {
+            if (!this.model.get('user_id')) { this.model.set({user_id: "1"})}; 
             var jmodel = this.model.toJSON();
+
             if(this.model.collection == Pos) {
                 jmodel.vendor = jmodel.vendor || Vendors.get(jmodel.vendor_id).toJSON();
+                jmodel.user = jmodel.user || Users.get(jmodel.user_id).toJSON();
             }
             $(this.el).html(JST[this.options.template](jmodel));
             return this;    
+        },
+
+        vendor: function() {
+            console.log(this.model);
         }
 
     });
@@ -64,8 +80,6 @@ $(function() {
 
     NewResourceView = Backbone.View.extend({
         el: $("#middle #sub-right"),
-
-        //template: "newResource",
 
         events: {
             "click div#po-submit"  : "create",
@@ -84,8 +98,7 @@ $(function() {
         },
 
         render: function() {
-            //this.$('.side-header').html('Create ' + this.type);
-            $(this.el).append(JST[this.options.template]({
+            $(this.el).html(JST[this.options.template]({
                 "attrib" : this.attrib,
                 "collection" : this.collection,
                 "type" : this.type
@@ -97,39 +110,36 @@ $(function() {
 
         create: function() {
             if (this.type == "vendor") {
-                //console.log(this.collection);
                 this.collection.create({
                 name: $('.resource-vendor [name=name]').val()
-            });
-            $('[name=name]').val('');
-            return false;
-            } else if (this.type == "po") {
-                //console.log(this.collection);
-            
-            
-            var name = $('.resource-po [name=name]').val();
-            var vendor_id = Vendors.find(function(po) {
-                    return po.get("name") === name;
-            });
-            vendor_id = vendor_id.id;
-            var amount = $('.resource-po [name=amount]').val();
-            var date_needed = $('.resource-po [name=date-needed]').val();
-            if (vendor_id != "undefined"){
+                });
 
-            this.collection.create({
-                vendor_id: vendor_id,
-                needed: date_needed,
-                amount: amount,
-                user_id: interfaith.user_id
-            }, {error: function(model, error) {
-                console.log(model);
-                console.log(error);
+                $('[name=name]').val('');
+
+            } else if (this.type == "po") {
+            
+                var name = $('.resource-po [name=name]').val();
+                var vendor_id = Vendors.find(function(po) {
+                        return po.get("name") === name;
+                });
+                vendor_id = vendor_id.id;
+                var amount = $('.resource-po [name=amount]').val();
+                var date_needed = $('.resource-po [name=date-needed]').val();
+                
+                if (vendor_id != "undefined"){
+                    this.collection.create({
+                        vendor_id: vendor_id,
+                        needed: date_needed,
+                        amount: amount,
+                        user_id: interfaith.user_id
+                    }, {error: function(model, error) {
+                        console.log(model);
+                        console.log(error);
+                        }
+                    });
                 }
-            });
-            return false;
             }
-            return;
-            }
+            location.hash = "/"
         },
 
         check: function(event) {
@@ -138,7 +148,9 @@ $(function() {
             var search = $("#search").val();
             search += String.fromCharCode(event.which);
             search = search.toLowerCase();
+
             if (search === '') return;
+
             Vendors.chain()
                 .sortBy(function(model){ return model.attributes.name; })
                 .each(function(model) {
@@ -148,13 +160,11 @@ $(function() {
                     if (chara >= 0) {
                         self.addResult(model);
                     }
-
                 });
-
         },
 
         addResult: function(model) {
-            $(".resource-results").append("<div>" + model.attributes.name + "</div>");
+            $(".resource-results").append("<div>" + model.get('name') + "</div>");
         }
 
 
@@ -163,8 +173,21 @@ $(function() {
     SimpleView = Backbone.View.extend({
        
        initialize: function() {
-            this.template = this.options.template;
-           $(this.el).html(JST[this.template]);
+            _.bindAll(this, "render");
+            this.data = this.model || {};
+            if ($.isEmptyObject(this.data) == false ) {this.data = this.data.toJSON()};
+            //this.template = this.options.template;
+            if (this.model && !this.model.get('user_id')) { 
+                this.model.set({user_id: "1"}) 
+                this.data = this.model.toJSON();
+                this.data.vendor = this.data.vendor || Vendors.get(this.data.vendor_id).toJSON();
+                this.data.user = this.data.user || Users.get(this.data.user_id).toJSON();
+            }
+            this.render();
+       },
+
+       render: function() {
+           $(this.el).html(JST[this.options.template](this.data));
        }
 
     });
@@ -178,7 +201,8 @@ $(function() {
             "click #sign_in": "signInForm",
             "click #signinlogin": "login",
             "click #sign_in_form": "stopPropagation",
-            "click #sign_in_over": "signInFormClose"
+            "click #sign_in_over": "signInFormClose",
+            "click a": "click"
         },
 
         initialize: function() {
@@ -191,35 +215,35 @@ $(function() {
 
         },
 
+        click: function(e) {
+            //console.log(e);
+            //var jhref = e.target.href.substr(22);
+            //App.navigate( e.target.href.substr(22), true);
+            //console.log(this);
+            //return false;
+        },
+
         stopPropagation: function(e) {
             e.stopPropagation();
         },
 
         signInForm: function() {
-            //var testing = $("#sign_in_form, top, middle");
-            //var testing += $("")
             $("#sign_in_over").fadeIn();
             $("#sign_in_form").show("slide", {direction: "right" }, 750);
-            //testing.slideDown();
         },
 
         signInFormClose: function() {
-            $("#sign_in_form").hide("slide", {direction: "right" }, 750);
+            $("#sign_in_form").hide("slide", {direction: "right" }, 500);
             $("#sign_in_over").fadeOut();
         },
 
         addOne: function(res) {
-            //console.log(res);
-            //console.log(res.template);
             var view = new ResourceView({model: res, template: res.template});
-            this.$("#" + res.collection.template +" #resource-list").append(view.render().el);
+            this.$("#sub-right #resource-list").append(view.render().el);
         },
 
         addAll: function(col) {
-            if (col.show != "show") {
             col.each(this.addOne);
-            col.show = "show";
-            }
         },
 
         login: function() {
@@ -232,11 +256,10 @@ $(function() {
             };
             currentUser = new CurrentUser;
             currentUser.save(login, { success: function(model, response) {
-                            console.log(response.email);
                             location.reload(true);
                         }, error: function(model,  response) {
-                            console.log(response);
                             console.log(model);
+                            console.log(response);
                         }});
 
         }
@@ -244,20 +267,21 @@ $(function() {
 
     });
 
-    /* Main Controller */
-    AppController = Backbone.Controller.extend({
+    /* Main Router */
+    AppRouter = Backbone.Router.extend({
 
         initialize: function() {
-            Vendors.fetch();
             Pos.fetch();
-            this.saveLocation('!/');
+            Vendors.fetch();
+            Users.fetch();
+            this.navigate("");
         },
 
         routes: {
-            "!/" : "index",
-            "!/:resource" : "resource",
-            "!/:resource/new" : "newResource",
-            "!/:resource/:id" : "showResource"
+            "" : "index",
+            ":resource" : "resource",
+            ":resource/new" : "newResource",
+            "po/:id" : "showPo"
         }, 
 
         index: function() {
@@ -265,21 +289,18 @@ $(function() {
             if (typeof MainView == "undefined") {
                 MainView = new AppView();
             };
-            $("#middle #sub-right > div").addClass('hidden');
-            $("#welcome").removeClass('hidden');
         },
 
         resource: function(resource) {
             if (resource == "po") {
-                $("#middle #sub-right > div").addClass('hidden');
-                $("#po").removeClass('hidden');
                 this.sideHeader('List POs');
+                $('#sub-right').html('<div class="header cf"><div class="po-vendor">Vendor Name</div><div class="po-date">Date Needed</div><div class="po-user">User Email</div><div class="po-amount">Amount</div></div><ul id="resource-list" class="resource-list"></ul>');
                 Pos.template = "po";
                 MainView.addAll(Pos);
             } else if (resource == "vendor") {
-                $("#middle #sub-right > div").addClass('hidden');
-                $("#vendor").removeClass('hidden');
                 this.sideHeader('List Vendors');
+                //var html =
+                $('#sub-right').html('<div class="header cf"><div class="po-vendor">Vendor Name</div><div class="po-amount">Approved</div></div><ul id="resource-list" class="resource-list"></ul>');
                 Vendors.template = "vendor";
                 MainView.addAll(Vendors);
             };
@@ -287,33 +308,40 @@ $(function() {
         },
 
         newResource: function(resource) {
-            $("#middle #sub-right > div").addClass('hidden');
             if (resource == 'vendor') {
                 this.sideHeader('Create Vendor');
-                if(typeof vendorNewView == "undefined") {
-                    vendorNewView = new NewResourceView({model: new Vendor(), collection: Vendors, template: "newVendor"});
-                }
+                new NewResourceView({model: new Vendor(), collection: Vendors, template: "newVendor"});
             } else if (resource == 'po') {
                 this.sideHeader('Create PO');
-                if(typeof poNewView == "undefined") {
-                    poNewView = new NewResourceView({model: new Po(), type: "po", collection: Pos, template: "newPo", attrib: "vendor" });
-                }
+                new NewResourceView({model: new Po(), type: "po", collection: Pos, template: "newPo", attrib: "vendor" });
             }
-            $('.resource-' + resource).removeClass('hidden');
         },
-
+    
         sideHeader: function(display) {
             $("#middle .right .side-header").html(display);
         },
 
-        showResource: function(resource, id) {
-            
+        showPo: function(id) {
+            this.sideHeader('PO #' + id );
+            var po = new Po({id: id});
+            po.fetch({
+                success: function(model, resp) {
+                    var pablo = new SimpleView({model: po, el: $("#sub-right"), template: "viewPo"});
+                    //view.el.html(view.render());
+                },
+                error: function(model, resp) {
+                    console.log('Error showResource');
+                    console.log(model);
+                }
+            });
+
         }
     });
 
     
-    App = new AppController();
+    App = new AppRouter();
     MainView = new AppView();
+    //Backbone.history.start({pushState: true});
     Backbone.history.start();
 
 

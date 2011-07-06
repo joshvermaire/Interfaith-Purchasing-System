@@ -36,6 +36,52 @@ body {
 .cf:after {
     clear:both;
 }
+/* Buttons from http://webdesignerwall.com/tutorials/css3-gradient-buttons */
+.button {
+	display: inline-block;
+	outline: none;
+	cursor: pointer;
+	text-align: center;
+	text-decoration: none;
+	font: 14px/100% Arial, Helvetica, sans-serif;
+	padding: .5em 2em .55em;
+	text-shadow: 0 1px 1px rgba(0,0,0,.3);
+	-webkit-border-radius: .5em; 
+	-moz-border-radius: .5em;
+	border-radius: .5em;
+	-webkit-box-shadow: 0 1px 2px rgba(0,0,0,.2);
+	-moz-box-shadow: 0 1px 2px rgba(0,0,0,.2);
+	box-shadow: 0 1px 2px rgba(0,0,0,.2);
+}
+.button:hover {
+	text-decoration: none;
+}
+.button:active {
+	position: relative;
+	top: 1px;
+}
+
+.blue {
+    color: #d9eef7;
+    border: solid 1px #0076a3;
+    background: #0095cd;
+    background: -webkit-gradient(linear, left top, left bottom, from(#00adee), to(#0078a5));
+    background: -moz-linear-gradient(top,  #00adee,  #0078a5);
+    filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#00adee', endColorstr='#0078a5');
+}
+.blue:hover {
+    background: #007ead;
+    background: -webkit-gradient(linear, left top, left bottom, from(#0095cc), to(#00678e));
+    background: -moz-linear-gradient(top,  #0095cc,  #00678e);
+    filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#0095cc', endColorstr='#00678e');
+}
+.blue:active {
+    color: #80bed6;
+    background: -webkit-gradient(linear, left top, left bottom, from(#0078a5), to(#00adee));
+    background: -moz-linear-gradient(top,  #0078a5,  #00adee);
+    filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#0078a5', endColorstr='#00adee');
+}
+
 
 /* Start CSS */
 #app, #top, #middle, #bottom {
@@ -184,16 +230,97 @@ height: 52px;
 	bottom: 0px;
 	left: 248px;
 	right: 0px;
+	background: #FFF;
 }
 
-#middle .right > div {
-	margin: 0 8px;
+#middle .right h5 {
+	padding: 0 8px;
+}
+
+#sub-right {
+	height: 100%;
+	position: absolute;
+	margin: 0px;
+	z-index: 1;
+	visibility: visible;
+	display: block;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0px;
+	background: white;
 }
 
 #middle .right .side-header {
 	text-transform: none;
 	font-weight: 700;
 	color: #111;
+}
+
+.resource-list {
+	color: #F1F1F1;
+	border-radius: 0 0 8px 8px;
+	background: #F1F1F1;
+}
+
+.resource-list li {
+	border-bottom: 1px solid #DEDEDE;
+    border-left: 1px solid #DEDEDE;
+    border-right: 1px solid #DEDEDE;
+	padding: 13px 20px;
+	color: #333;
+	cursor: pointer;
+}
+
+.resource-list li:hover {
+	background: #598DA3;
+	color: #F1F1F1;
+}
+
+.resource-list li:first{
+	border-radius: 8px 8;
+}
+
+#sub-right .header {
+	background: #D3D6D7;
+    border-radius: 8px 8px 0 0;
+    padding: 13px 20px;
+}
+
+div.form {
+	padding-bottom:15px;
+}
+
+div.form label, div.form span {
+	width: 80px;
+	text-align: right;
+	float:left;
+	margin-right: 20px;
+	padding: 5px 0 0;
+}
+
+#po-submit {
+	margin-left: 120px;
+}
+
+.destroy {
+	background: url('/images/destroy.png') no-repeat;
+	text-indent: -9999px;
+}
+
+.po-vendor, .po-date, .po-user, .po-amount {
+	width: 250px;
+
+}
+
+#po {
+
+}
+
+
+
+#po div, #po span, .header div {
+	float: left;
 }
 
 #bottom {
@@ -226,4 +353,70 @@ height: 52px;
 	margin-right: 10px;
 	padding: 0 10px;
 	text-decoration: none;
+}
+
+#sign_in_over {
+	width: 100%; 
+	height: 100%; 
+	position: absolute; 
+	background: rgba(17,17,17,.7); 
+	z-index: 2; 
+	display:none;
+	overflow: hidden;
+}
+
+#sign_in_form {
+	z-index: 3;
+	color: black;
+	margin-top: 0px;
+	margin-right: auto;
+	margin-bottom: 0px;
+	margin-left: auto;
+	width: 400px;
+	top: 0px;
+	float: right;
+	height: 100%;
+	display: block;
+	position: relative;
+	background-position: initial initial;
+	background-repeat: initial initial;
+	background: #F1F1F1;
+}
+
+#sign_in_form h1 {
+	font-size: 25px;
+	text-align: center;
+	font-weight: bold;
+	padding-bottom: 10px;
+}
+
+#sign_in_form p {
+	font-size: 16px;
+	text-align: center;
+	padding: 0 20px 10px;
+}
+
+#sign_in_form input, .form input{
+	border-radius: 4px;
+	height: 22px;
+	width: 350px;
+	font-size: 15px;
+	margin: 5px 20px;
+	padding: 0 5px;
+	
+}
+
+#sign_in_form input[type=checkbox] {
+	width: auto;
+	height: auto;
+}
+
+.remember_me {
+	font-size: 15px;
+	line-height: 150%;
+	padding: 5px 0px 5px 20px;
+}
+
+#signinlogin {
+	margin: 5px 20px;
 }

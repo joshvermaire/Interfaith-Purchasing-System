@@ -15,10 +15,7 @@ class PosController < ApplicationController
   def show
     @po = Po.find(params[:id])
 
-    respond_to do |format|
-      format.html # show.html.erb
-      format.xml  { render :xml => @po }
-    end
+    respond_with @po.to_json(:include => :vendor)
   end
 
   # GET /pos/new

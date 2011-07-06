@@ -1,23 +1,23 @@
-<div class="resource resource-<%= type %>">
-    <div class="resource-content">
-    	<form>
-    		<div>
-		    <label for='vendor'>Vendor</label>
-		    <input id="search" name='name' type='text' autocomplete="off" />
-		    </div>
-		    <div>
-		    <label for='date-needed'>Date Needed</label>
-		    <input class="datepicker" name='date-needed' type='date' autocomplete="off" />
-		    </div>
-		    <div>
-		    <label for='amount'>Amount</label>
-		    <input name='amount' type='text' autocomplete="off" />
-		    </div>
-		    <div id="po-submit">Create</div>
+<div style="float:left; padding: 7px 0 0 7px; position:absolute;"><a href="/#!/"><img src="images/destroy.png" /></a></div>
+<div class="resource resource-<%= type %>" style="background: #f1f1f1; color: #333; border-radius: 8px; padding: 13px 20px; border: 1px solid #DEDEDE;">
+	<div class="resource-results" style="position: absolute; top: 60px; left: 300px;"></div>
+	<div class="resource-content;">
+		<form>
+			<div class="form">
+			<label for='vendor'>Vendor</label>
+			<input id="search" name='name' type='text' autocomplete="off" />
+			</div>
+			<div class="form">
+			<label for='date-needed'>Date Needed</label>
+			<input class="datepicker" name='date-needed' type='date' autocomplete="off" />
+			</div>
+			<div class="form">
+			<label for='amount'>Amount</label>
+			<input name='amount' type='text' autocomplete="off" />
+			</div>
+			<div id="po-submit" class="button blue">Create</div>
 		</form>
 
 
-    </div>
-    <div class="resource-results"></div>
-    <div><a href="/#!/">Go Back</a></div>
+	</div>
 </div>

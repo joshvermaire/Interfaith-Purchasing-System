@@ -7,7 +7,7 @@
   <%= csrf_meta_tag %>
 <% if current_user %>
 <script>
-var interfaith = {"user_id": <%= current_user.id %>};
+interfaith = {"user_id": <%= current_user.id %>, "email": "<%= current_user.email %>", "roles": "<%= current_user.roles[0].name %>"};
 </script>  
 <% end %>
 
@@ -17,20 +17,28 @@ var interfaith = {"user_id": <%= current_user.id %>};
     <p class="notice"><%= notice %></p>
     <p class="alert"><%= alert %></p>
     <% if !current_user %>
-    <div id="sign_in_over" style="width: 100%; height: 100%; position: absolute; background: rgba(17,17,17,.7); z-index: 2; display:none">
-      <div id="sign_in_form" style="z-index: 3; color: black; font-size: 20px; position: relative; margin: 0 auto; width: 400px; top: 0;  background:red; right: -400; float: right; height: 100%;">
-      <input id="signinemail" type="text" placeholder="Email Address" autocomplete="off" />
-      <br/>
-      <input id="signinpw" type="password" placeholder="Password" autocomplete="off"/>
-      <br/>
-      <input type="checkbox" name="remember_me" />Remember me
-      <div id="signinlogin">Sign In</div>
+    <div id="sign_in_over">
+      <div id="sign_in_form" class="cf">
+        <div class="cf" style="height:25%"></div>
+        <div class="cf">
+          <h1>Interfaith PO System</h1>
+          <p>Welcome to Interfaith's PO system. Please sign in to continue.</p>
+          <input id="signinemail" type="text" placeholder="Email Address" autocomplete="off" />
+          <br/>
+          <input id="signinpw" type="password" placeholder="Password" autocomplete="off"/>
+          <br/>
+          <div class="remember_me">
+          <span>Remember me</span>
+          <input type="checkbox" name="remember_me" />
+          </div>
+        </div>
+          <div id="signinlogin" class="button blue">Sign In</div>
       </div>
       </div>
     <% end %>
     <div id="top" class="cf">
       <div class="top-header">
-        <h4><a href="/#!/">Interfaith</a></h4>
+        <h4><a href="#">Interfaith</a></h4>
       
         <ul>
           <% if user_signed_in? %>
@@ -44,8 +52,8 @@ var interfaith = {"user_id": <%= current_user.id %>};
       </div>
       <div class="nav">
         <ul>
-        <li><a href="#!/po">POs</a></li>
-        <li><a href="#!/vendor">Vendors</a></li>
+        <li id="po-click"><a href="/#po">POs</a></li>
+        <li><a href="/#vendor">Vendors</a></li>
         </ul>
         <ul class="header-right"></ul>
       </div>
@@ -54,8 +62,8 @@ var interfaith = {"user_id": <%= current_user.id %>};
       <div class="left">
         <h5 class="side-header">Accounting</h5>
         <ul id="sidebar-list">
-        <li><a href="#!/po">POs</a></li>
-        <li><a href="#!/vendor">Vendors</a></li>
+        <li><a href="/#po">POs</a></li>
+        <li><a href="/#vendor">Vendors</a></li>
         </ul>
       </div>
       <div class="right">

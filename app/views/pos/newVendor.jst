@@ -1,14 +1,13 @@
-<div class="resource resource-<%= type %>">
+<div style="float:left; padding: 7px 0 0 7px; position:absolute;"><a href="/#!/"><img src="images/destroy.png" /></a></div>
+<div class="resource resource-<%= type %>" style="background: #f1f1f1; color: #333; border-radius: 8px; padding: 13px 20px; border: 1px solid #DEDEDE;">
+	<div class="resource-results" style="position: absolute; top: 60px; left: 300px;"></div>
     <div class="resource-content">
     	<form>
-		    <label for='name'>Title</label>
-		    <input id="search" name='name' type='text' autocomplete="off" />
-		    
-		    <div id="vendor-submit">Create</div>
+    		<div class="form">
+				<label for='name'>Title</label>
+				<input id="search" name='name' type='text' autocomplete="off" />
+		    </div>
+		    <div id="po-submit" class="button blue">Create</div>
 		</form>
-
-
     </div>
-    <div class="resource-results"></div>
-    <div><a href="/#!/">Go Back</a></div>
 </div>
