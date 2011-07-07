@@ -43,13 +43,14 @@ interfaith = {"user_id": <%= current_user.id %>, "email": "<%= current_user.emai
         <ul>
           <% if user_signed_in? %>
             <li>Signed in as <%= current_user.email %>. Not you?</li>
-            <%= link_to "Sign out", destroy_user_session_path %>
+            <li id="signout">Sign Out</li>
           <% else %>
             <li id="sign_up">Sign Up</li><li id="sign_in">Sign In</li>
           <% end %>
         </ul>
 
       </div>
+      <% if user_signed_in? %>
       <div class="nav">
         <ul>
         <li id="po-click"><a href="/#po">POs</a></li>
@@ -57,8 +58,9 @@ interfaith = {"user_id": <%= current_user.id %>, "email": "<%= current_user.emai
         </ul>
         <ul class="header-right"></ul>
       </div>
+      <% end %>
     </div>
-    <div id="middle" class="cf">
+    <div id="middle" class="cf" <% if !user_signed_in? %> style="top:28px; border-top: 1px solid #999;" <% end %>>
       <div class="left">
         <h5 class="side-header">Accounting</h5>
         <ul id="sidebar-list">
@@ -67,7 +69,6 @@ interfaith = {"user_id": <%= current_user.id %>, "email": "<%= current_user.emai
         </ul>
       </div>
       <div class="right">
-          <h5 class="side-header">Welcome!</h5>
           <div id="sub-right">
           <div id="welcome">
             <p>I'm sure some information will go here</p>

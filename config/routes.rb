@@ -1,9 +1,8 @@
 Interfaith::Application.routes.draw do
   get "home/index"
 
-  devise_for :users do
-    resources :users
-  end
+  devise_for :users 
+  resources :users
   resources :pos
   resources :vendors
   #resources :users
@@ -21,9 +20,6 @@ Interfaith::Application.routes.draw do
 
   # Sample resource route (maps HTTP verbs to controller actions automatically):
   #   resources :products
-  resources :posts do
-    resources :comments
-  end
 
 
   # Sample resource route with options:

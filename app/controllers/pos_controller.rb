@@ -1,13 +1,19 @@
 class PosController < ApplicationController
   before_filter :authenticate_user!, :except => [:show, :index, :create, :destroy]
+  load_and_authorize_resource
   respond_to :json
   # GET /pos
   # GET /pos.xml
   def index
-    @pos = Po.all
 
     #respond_with current_user.id
-    respond_with @pos.to_json(:include => :vendor)
+    if current_user.role? :admin
+      @pos = Po.find(:all, :limit => 1, :select => "confirmed, paid, needed, amount, id, approved, vendor_id, user_id", :include => [:user, :vendor])
+      respond_with @pos.to_json(:include => [:user, :vendor])
+    else
+      @pos = :error
+      respond_with @pos
+    end
   end
 
   # GET /pos/1
@@ -15,7 +21,7 @@ class PosController < ApplicationController
   def show
     @po = Po.find(params[:id])
 
-    respond_with @po.to_json(:include => :vendor)
+    respond_with @po.to_json(:include => [:user, :vendor])
   end
 
   # GET /pos/new

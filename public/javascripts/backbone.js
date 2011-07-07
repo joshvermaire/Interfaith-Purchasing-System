@@ -1,5 +1,14 @@
 $(function() {
 
+    server = "http://localhost:3000/";
+    loggedIn = function() {
+        if (interfaith.user_id) {
+            return true;
+        } else {
+            return false;
+        }
+    };
+
     // Set up current models
     Po = Backbone.Model.extend({
         template: "po",
@@ -11,7 +20,12 @@ $(function() {
     });
     User = Backbone.Model.extend();
     Vendor = Backbone.Model.extend({
-        template: "vendor"
+        template: "vendor",
+        url: function() {
+            var base = 'vendors';
+            if (this.isNew()) return base;
+            return base + (base.charAt(base.length - 1) == '/' ? '' : '/') + this.id;
+        }
     });
 
     // Set up collections
@@ -27,9 +41,7 @@ $(function() {
         url: '/users'
     });
 
-    CurrentUser = Backbone.Model.extend({
-        url: '/users/sign_in.json'
-    });
+    CurrentUser = Backbone.Model.extend();
 
     newUser = Backbone.Model.extend({
         url: '/users/edit.json'
@@ -53,7 +65,8 @@ $(function() {
         },
 
         events: {
-            "click .po-vendor"   : "vendor"
+            "click .po-vendor"   : "vendor",
+            "click" : "navigate"
         },
 
         tagName: "li",
@@ -72,6 +85,12 @@ $(function() {
 
         vendor: function() {
             console.log(this.model);
+        },
+
+        navigate: function() {
+            console.log('ResourceView :navigate');
+            var hash = window.location.hash;
+            App.navigate(hash + '/' + this.model.id, true);
         }
 
     });
@@ -180,8 +199,10 @@ $(function() {
             if (this.model && !this.model.get('user_id')) { 
                 this.model.set({user_id: "1"}) 
                 this.data = this.model.toJSON();
-                this.data.vendor = this.data.vendor || Vendors.get(this.data.vendor_id).toJSON();
-                this.data.user = this.data.user || Users.get(this.data.user_id).toJSON();
+                if (this.model.template == "po") {
+                    this.data.vendor = this.data.vendor || Vendors.get(this.data.vendor_id).toJSON();
+                    this.data.user = this.data.user || Users.get(this.data.user_id).toJSON();
+                }
             }
             this.render();
        },
@@ -198,8 +219,9 @@ $(function() {
         el: $("#app"),
 
         events: {
-            "click #sign_in": "signInForm",
+            "click li#sign_in": "signInForm",
             "click #signinlogin": "login",
+            "click #signout": "logout",
             "click #sign_in_form": "stopPropagation",
             "click #sign_in_over": "signInFormClose",
             "click a": "click"
@@ -209,7 +231,9 @@ $(function() {
             _.bindAll(this, 'addOne', 'addAll');
 
             Pos.bind('add', this.addOne);
-            //Pos.bind('refresh', this.addAll);
+            //Pos.bind('reset', this.addAll);
+            //Vendors.bind('add', this.addOne);
+            //Vendors.bind('reset', this.addAll);
             
             bottomView = new SimpleView({el: $("#bottom"), template: "footer"});
 
@@ -228,12 +252,15 @@ $(function() {
         },
 
         signInForm: function() {
+            //e.stopPropogation();
+            App.navigate('users/sign_in');
             $("#sign_in_over").fadeIn();
-            $("#sign_in_form").show("slide", {direction: "right" }, 750);
+            //$("#sign_in_over").show("slide", {direction: "right" }, 750);  //Changed from #sign_in_form
         },
 
         signInFormClose: function() {
-            $("#sign_in_form").hide("slide", {direction: "right" }, 500);
+            //$("#sign_in_form").hide("slide", {direction: "right" }, 500);
+            App.navigate('');
             $("#sign_in_over").fadeOut();
         },
 
@@ -254,14 +281,28 @@ $(function() {
                     remember_me: $("#sign_in_form [name=remember_me]").val()
                     }
             };
-            currentUser = new CurrentUser;
+            var url = server + "users/sign_in.json";
+            currentUser = new CurrentUser();
+            currentUser.url = url;
             currentUser.save(login, { success: function(model, response) {
-                            location.reload(true);
+                            window.location = server;
                         }, error: function(model,  response) {
                             console.log(model);
                             console.log(response);
                         }});
 
+        },
+
+        logout: function() {
+            App.navigate('users/sign_out');
+            var url = server + "users/sign_out.json";
+            currentUser = new Backbone.Model;
+            currentUser.url = url;
+            currentUser.fetch({
+                success: function(model, response) {
+                    window.location = server; 
+                }
+            });
         }
 
 
@@ -274,59 +315,51 @@ $(function() {
             Pos.fetch();
             Vendors.fetch();
             Users.fetch();
-            this.navigate("");
+            MainView = new AppView();
+            //_.extend(, this.routes)
+            //this.navigate(window.location.hash, true);
         },
 
         routes: {
-            "" : "index",
-            ":resource" : "resource",
-            ":resource/new" : "newResource",
-            "po/:id" : "showPo"
+            ""               : "index",
+
+            /* PO Routes */
+            "po"             : "resourcePo",
+            "po/new"         : "newPo",
+            "po/:id"         : "showPo",
+
+            /* Vendor Routes */
+            "vendor"         : "resourceVendor",
+            "vendor/new"     : "newVendor",
+            "vendor/:id"     : "showVendor",
+
+            /* User Routes */
+            "users/sign_in"  : "sign_in",
+            "users/sign_out" : "sign_out",
+
+            /* 404 */
+            "*path"          : "fourohfour"
         }, 
 
         index: function() {
-            this.sideHeader('Welcome');
-            if (typeof MainView == "undefined") {
-                MainView = new AppView();
-            };
+            $('#sub-right').html('<h1>WELCOME, friend</h1>');
         },
 
-        resource: function(resource) {
-            if (resource == "po") {
-                this.sideHeader('List POs');
-                $('#sub-right').html('<div class="header cf"><div class="po-vendor">Vendor Name</div><div class="po-date">Date Needed</div><div class="po-user">User Email</div><div class="po-amount">Amount</div></div><ul id="resource-list" class="resource-list"></ul>');
-                Pos.template = "po";
-                MainView.addAll(Pos);
-            } else if (resource == "vendor") {
-                this.sideHeader('List Vendors');
-                //var html =
-                $('#sub-right').html('<div class="header cf"><div class="po-vendor">Vendor Name</div><div class="po-amount">Approved</div></div><ul id="resource-list" class="resource-list"></ul>');
-                Vendors.template = "vendor";
-                MainView.addAll(Vendors);
-            };
-            
+        resourcePo: function() {
+            $('#sub-right').html('<div class="header cf"><div class="po-vendor">Vendor Name</div><div class="po-date">Date Needed</div><div class="po-user">User Email</div><div class="po-amount">Amount</div></div><ul id="resource-list" class="resource-list"></ul>');
+            Pos.template = "po";
+            MainView.addAll(Pos);
         },
 
-        newResource: function(resource) {
-            if (resource == 'vendor') {
-                this.sideHeader('Create Vendor');
-                new NewResourceView({model: new Vendor(), collection: Vendors, template: "newVendor"});
-            } else if (resource == 'po') {
-                this.sideHeader('Create PO');
-                new NewResourceView({model: new Po(), type: "po", collection: Pos, template: "newPo", attrib: "vendor" });
-            }
-        },
-    
-        sideHeader: function(display) {
-            $("#middle .right .side-header").html(display);
+        newPo: function() {
+            new NewResourceView({model: new Po(), type: "po", collection: Pos, template: "newPo", attrib: "vendor" });
         },
 
         showPo: function(id) {
-            this.sideHeader('PO #' + id );
             var po = new Po({id: id});
             po.fetch({
                 success: function(model, resp) {
-                    var pablo = new SimpleView({model: po, el: $("#sub-right"), template: "viewPo"});
+                    new SimpleView({model: po, el: $("#sub-right"), template: "viewPo"});
                     //view.el.html(view.render());
                 },
                 error: function(model, resp) {
@@ -335,15 +368,52 @@ $(function() {
                 }
             });
 
+        },
+        
+        resourceVendor: function() {
+                $('#sub-right').html('<div class="header cf"><div class="po-vendor">Vendor Name</div><div class="po-amount">Approved</div></div><ul id="resource-list" class="resource-list"></ul>');
+                Vendors.template = "vendor";
+                MainView.addAll(Vendors);
+            
+        },
+
+        newVendor: function() {
+            new NewResourceView({model: new Vendor(), collection: Vendors, template: "newVendor"});
+        },
+
+        showVendor: function(id) {
+            var vendor = new Vendor({id: id});
+            vendor.fetch({
+                success: function(model, resp) {
+                    new SimpleView({model: vendor, el: $("#sub-right"), template: "viewVendor"});
+                    //view.el.html(view.render());
+                },
+                error: function(model, resp) {
+                    console.log('Error showResource');
+                    console.log(model);
+                }
+            });
+
+        },
+
+        sign_in: function() {
+            MainView.signInForm();
+        },
+
+        sign_out: function() {
+            MainView.logout();
+        },
+
+        fourohfour: function(path) {
+            alert(path + ' 404 baby');
         }
+
     });
 
     
     App = new AppRouter();
-    MainView = new AppView();
+    //MainView = new AppView();
     //Backbone.history.start({pushState: true});
     Backbone.history.start();
-
-
     
 });

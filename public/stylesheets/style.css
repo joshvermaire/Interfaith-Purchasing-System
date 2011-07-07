@@ -314,7 +314,7 @@ div.form label, div.form span {
 }
 
 #po {
-
+	overflow: hidden;
 }
 
 
