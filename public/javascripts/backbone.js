@@ -84,12 +84,12 @@ $(function() {
                 var interfaith = interfaith || {};
                 interfaith.user_id = interfaith.user_id || 1;
                 if (!jmodel.approved && interfaith.user_id == 1) {
-                    jmodel.approved = '<div class="approved">Approve me</div>';
+                    jmodel.approved = '<div class="approved cf">Approve</div>';
                 } else {
                     jmodel.approved = '<div style="height:34px;width:85px;"></div>';
                 };
                 if (!jmodel.confirmed && interfaith.user_id == 1) {
-                    jmodel.confirmed = '<div class="confirmed">Confirm me</div>';
+                    jmodel.confirmed = '<div class="confirmed cf">Confirm</div>';
                 } else {
                     jmodel.confirmed = '<div style="height:34px;width:85px;"></div>';
                 }
@@ -423,6 +423,26 @@ $(function() {
             var po = new Po({id: id});
             po.fetch({
                 success: function(model, resp) {
+                    var approve_name, confirm_name, appNum, confNum;
+                    appNum = model.get('approved');
+                    confNum = model.get('confirmed');
+                    if (appNum) {
+                        approve_name = Users.get(appNum).get('email') || null;
+                    };
+                    if (confNum) {
+                        confirm_name = Users.get(confNum).get('email') || null;
+                    };
+                    if (approve_name) {
+                        approve_name = "This PO approved by: " + approve_name;
+                    } else {
+                        approve_name = '<div class="approved">Approve</div>';
+                    }
+                    if (confirm_name) {
+                        confirm_name = "This PO confirmed by: " + confirm_name;
+                    } else {
+                        confirm_name = '<div class="confirmed">Confirm</div>';
+                    };
+                    po.set({aname: approve_name, cname: confirm_name});
                     new SimpleView({model: po, el: $("#sub-right"), template: "viewPo"});
                     //view.el.html(view.render());
                 },

@@ -303,6 +303,12 @@ height: 52px;
     padding: 13px 20px;
 }
 
+.resource-content > div {
+	font-size: 14px;
+    height: 26px;
+    line-height: 26px;
+}
+
 div.form {
 	padding-bottom:15px;
 }
@@ -333,7 +339,7 @@ div.form label, div.form span {
 	width: 100px;
 }
 
-.resource-list li div.approved, .resource-list li div.confirmed {
+.resource-list li div.approved, .resource-list li div.confirmed, .resource-content div.confirmed, .resource-content div.approved {
 	border-radius: 5px;
 	color: #F1F1F1;
 	padding: 0 7px;
@@ -342,12 +348,14 @@ div.form label, div.form span {
 	height: 26px;
 }
 
-.resource-list li div.approved {
+.resource-list li div.approved, .resource-content div.approved {
 	background: #598DA3;
+	width: 66px;
 }
 
-.resource-list li div.confirmed {
+.resource-list li div.confirmed, .resource-content div.confirmed {
 	background: #A3595A;
+	width: 66px;
 }
 
 .resource-list li:hover div.approved, .resource-list li:hover div.confirmed {
