@@ -9,6 +9,7 @@ gem 'sqlite3'
 gem 'jammit'
 gem 'devise', :git => 'git://github.com/plataformatec/devise.git'
 gem 'cancan'
+gem 'jquery-rails', '>= 1.0.3'
 
 # Use unicorn as the web server
 # gem 'unicorn'

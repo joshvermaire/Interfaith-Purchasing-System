@@ -1,6 +1,6 @@
 class PosController < ApplicationController
   #before_filter :authenticate_user!, :except => [:show, :index, :create, :destroy, :update]
-  #load_and_authorize_resource
+  load_and_authorize_resource
   respond_to :json
   # GET /pos
   # GET /pos.xml
@@ -8,7 +8,7 @@ class PosController < ApplicationController
 
     #respond_with current_user.id
     #if current_user.role? :admin
-      @pos = Po.find(:all, :limit => 10, :select => "confirmed, paid, needed, amount, id, approved, vendor_id, user_id", :include => [:user, :vendor])
+      @pos = Po.find(:all, :limit => 20, :select => "confirmed, paid, needed, amount, id, approved, vendor_id, user_id", :include => [:user, :vendor])
       respond_with @pos.to_json(:include => [:user, :vendor])
     #end
   end
@@ -32,7 +32,7 @@ class PosController < ApplicationController
   # GET /pos/1/edit
   def edit
     @po = Po.find(params[:id])
-    @po.update_attributes pick(params, :approved)
+    @po.update_attributes pick(params, :approved, :confirmed)
     respond_with @po
   end
 
@@ -47,6 +47,7 @@ class PosController < ApplicationController
   # PUT /pos/1.xml
   def update
     @po = Po.find(params[:id])
+    #authorize! :update, @po
 
     @po.update_attributes pick(params, :approved)
     respond_with @po
