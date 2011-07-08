@@ -68,6 +68,7 @@ $(function() {
         events: {
             "click .po-vendor"   : "vendor",
             "click .approved"    : "approved",
+            "click .confirmed"   : "confirmed",
             "click"              : "navigate"
         },
 
@@ -85,8 +86,13 @@ $(function() {
                 if (!jmodel.approved && interfaith.user_id == 1) {
                     jmodel.approved = '<div class="approved">Approve me</div>';
                 } else {
-                    jmodel.approved = null;
+                    jmodel.approved = '<div style="height:34px;width:85px;"></div>';
                 };
+                if (!jmodel.confirmed && interfaith.user_id == 1) {
+                    jmodel.confirmed = '<div class="confirmed">Confirm me</div>';
+                } else {
+                    jmodel.confirmed = '<div style="height:34px;width:85px;"></div>';
+                }
             }
             $(this.el).html(JST[this.options.template](jmodel));
             return this;    
@@ -101,8 +107,23 @@ $(function() {
             this.model.unset("vendors");
             this.model.save({approved: interfaith.user_id});
             var hash = window.location.hash;
-            if (hash == '#po/approve') {
+            if (hash == '#po/approve' || hash == '#po/confirm') {
                 this.$('.approved').fadeOut();
+            } else {
+            var self = this;
+            $(this.el).fadeOut(750, function() { self.remove()});
+            };
+
+        },
+
+        confirmed: function() {
+            var interfaith = interfaith || {};
+            interfaith.user_id = interfaith.user_id || 1;
+            this.model.unset("vendors");
+            this.model.save({confirmed: interfaith.user_id});
+            var hash = window.location.hash;
+            if (hash == '#po/approve' || hash == '#po/confirm') {
+                this.$('.confirmed').fadeOut();
             } else {
             var self = this;
             $(this.el).fadeOut(750, function() { self.remove()});
@@ -351,6 +372,7 @@ $(function() {
             "po"             : "resourcePo",
             "po/new"         : "newPo",
             "po/approve"     : "approvePo",
+            "po/confirm"     : "confirmPo",
             "po/:id"         : "showPo",
 
             /* Vendor Routes */
@@ -385,6 +407,14 @@ $(function() {
             $('#sub-right').html('<div class="header cf"><div class="po-vendor">Vendor Name</div><div class="po-date">Date Needed</div><div class="po-user">User Email</div><div class="po-amount">Amount</div></div><ul id="resource-list" class="resource-list"></ul>');
             Pos.template = "po";
             var num = Pos.filter(function(model) { return model.get('approved') == null});
+            var nums = _.each(num, function(n) { MainView.addOne(n); });
+
+        },
+
+        confirmPo: function() {
+            $('#sub-right').html('<div class="header cf"><div class="po-vendor">Vendor Name</div><div class="po-date">Date Needed</div><div class="po-user">User Email</div><div class="po-amount">Amount</div></div><ul id="resource-list" class="resource-list"></ul>');
+            Pos.template = "po";
+            var num = Pos.filter(function(model) { return model.get('confirmed') == null});
             var nums = _.each(num, function(n) { MainView.addOne(n); });
 
         },

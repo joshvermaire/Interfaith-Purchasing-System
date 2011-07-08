@@ -249,6 +249,7 @@ height: 52px;
 	left: 0;
 	right: 0px;
 	background: white;
+	overflow-y: auto;
 }
 
 #sub-right h1 {
@@ -323,13 +324,16 @@ div.form label, div.form span {
 	text-indent: -9999px;
 }
 
-.po-vendor, .po-date, .po-user, .po-amount {
+.po-vendor, .po-date, .po-user {
 	width: 250px;
 
 }
 
-.resource-list li div.approved {
-	background: #598DA3;
+.po-amount {
+	width: 100px;
+}
+
+.resource-list li div.approved, .resource-list li div.confirmed {
 	border-radius: 5px;
 	color: #F1F1F1;
 	padding: 0 7px;
@@ -338,12 +342,20 @@ div.form label, div.form span {
 	height: 26px;
 }
 
-.resource-list li:hover div.approved {
+.resource-list li div.approved {
+	background: #598DA3;
+}
+
+.resource-list li div.confirmed {
+	background: #A3595A;
+}
+
+.resource-list li:hover div.approved, .resource-list li:hover div.confirmed {
 	background: #F1F1F1;
 	color: #598DA3;
 }
 
-.resource-list li div.approved:hover {
+.resource-list li div.approved:hover, .resource-list li div.confirmed:hover {
 	background: #F4FCE8;
 }
 
