@@ -5,6 +5,9 @@
   <%= stylesheet_link_tag :all %>
   <%= include_javascripts :interfaith %>
   <%= csrf_meta_tag %>
+<script>
+//Pos.reset(<%= pos.to_json %>);
+</script>
 <% if current_user %>
 <script>
 interfaith = {"user_id": <%= current_user.id %>, "email": "<%= current_user.email %>", "roles": "<%= current_user.roles[0].name %>"};
@@ -39,7 +42,6 @@ interfaith = {"user_id": <%= current_user.id %>, "email": "<%= current_user.emai
     <div id="top" class="cf">
       <div class="top-header">
         <h4><a href="#">Interfaith</a></h4>
-      
         <ul>
           <% if user_signed_in? %>
             <li>Signed in as <%= current_user.email %>. Not you?</li>

@@ -61,12 +61,14 @@ $(function() {
     ResourceView = Backbone.View.extend({
 
         initialize: function() {
-          _.bindAll(this, 'render');
+          _.bindAll(this, 'render', 'vendor', 'approved', 'navigate');
+          //this.model.bind("change:approved", console.log(this.model));
         },
 
         events: {
             "click .po-vendor"   : "vendor",
-            "click" : "navigate"
+            "click .approved"    : "approved",
+            "click"              : "navigate"
         },
 
         tagName: "li",
@@ -78,19 +80,44 @@ $(function() {
             if(this.model.collection == Pos) {
                 jmodel.vendor = jmodel.vendor || Vendors.get(jmodel.vendor_id).toJSON();
                 jmodel.user = jmodel.user || Users.get(jmodel.user_id).toJSON();
+                var interfaith = interfaith || {};
+                interfaith.user_id = interfaith.user_id || 1;
+                if (!jmodel.approved && interfaith.user_id == 1) {
+                    jmodel.approved = '<div class="approved">Approve me</div>';
+                } else {
+                    jmodel.approved = null;
+                };
             }
             $(this.el).html(JST[this.options.template](jmodel));
             return this;    
         },
 
         vendor: function() {
-            console.log(this.model);
         },
 
-        navigate: function() {
-            console.log('ResourceView :navigate');
+        approved: function() {
+            var interfaith = interfaith || {};
+            interfaith.user_id = interfaith.user_id || 1;
+            this.model.unset("vendors");
+            this.model.save({approved: interfaith.user_id});
             var hash = window.location.hash;
-            App.navigate(hash + '/' + this.model.id, true);
+            if (hash == '#po/approve') {
+                this.$('.approved').fadeOut();
+            } else {
+            var self = this;
+            $(this.el).fadeOut(750, function() { self.remove()});
+            };
+
+        },
+
+        navigate: function(e) {
+            if (e.target.className == "approved") return;
+            var hash = window.location.hash;
+            if (hash == "#po" || hash == "#vendor") {
+                App.navigate(hash + '/' + this.model.id, true);
+            } else {
+                App.navigate("#po/" + this.model.id, true);
+            }
         }
 
     });
@@ -312,12 +339,9 @@ $(function() {
     AppRouter = Backbone.Router.extend({
 
         initialize: function() {
-            Pos.fetch();
-            Vendors.fetch();
-            Users.fetch();
-            MainView = new AppView();
+            //MainView = new AppView();
             //_.extend(, this.routes)
-            //this.navigate(window.location.hash, true);
+            this.navigate('');
         },
 
         routes: {
@@ -326,6 +350,7 @@ $(function() {
             /* PO Routes */
             "po"             : "resourcePo",
             "po/new"         : "newPo",
+            "po/approve"     : "approvePo",
             "po/:id"         : "showPo",
 
             /* Vendor Routes */
@@ -342,7 +367,8 @@ $(function() {
         }, 
 
         index: function() {
-            $('#sub-right').html('<h1>WELCOME, friend</h1>');
+            var num = Pos.filter(function(model) { return model.get('approved') == null});
+            $('#sub-right').html('<h1>WELCOME, friend</h1><p>You have ' + num.length + ' POs waiting to be approved.</p>');
         },
 
         resourcePo: function() {
@@ -353,6 +379,14 @@ $(function() {
 
         newPo: function() {
             new NewResourceView({model: new Po(), type: "po", collection: Pos, template: "newPo", attrib: "vendor" });
+        },
+
+        approvePo: function() {
+            $('#sub-right').html('<div class="header cf"><div class="po-vendor">Vendor Name</div><div class="po-date">Date Needed</div><div class="po-user">User Email</div><div class="po-amount">Amount</div></div><ul id="resource-list" class="resource-list"></ul>');
+            Pos.template = "po";
+            var num = Pos.filter(function(model) { return model.get('approved') == null});
+            var nums = _.each(num, function(n) { MainView.addOne(n); });
+
         },
 
         showPo: function(id) {
@@ -371,9 +405,9 @@ $(function() {
         },
         
         resourceVendor: function() {
-                $('#sub-right').html('<div class="header cf"><div class="po-vendor">Vendor Name</div><div class="po-amount">Approved</div></div><ul id="resource-list" class="resource-list"></ul>');
-                Vendors.template = "vendor";
-                MainView.addAll(Vendors);
+            $('#sub-right').html('<div class="header cf"><div class="po-vendor">Vendor Name</div><div class="po-amount">Approved</div></div><ul id="resource-list" class="resource-list"></ul>');
+            Vendors.template = "vendor";
+            MainView.addAll(Vendors);
             
         },
 
@@ -409,11 +443,15 @@ $(function() {
         }
 
     });
-
-    
-    App = new AppRouter();
+    Pos.fetch();
+    Vendors.fetch();
+    Users.fetch();
+    MainView = new AppView();
+    _.defer(function() {
+        App = new AppRouter();
+        Backbone.history.start();
+    });
     //MainView = new AppView();
     //Backbone.history.start({pushState: true});
-    Backbone.history.start();
     
 });

@@ -4,4 +4,8 @@ class ApplicationController < ActionController::Base
   rescue_from CanCan::AccessDenied do |exception|
     flash[:error] = exception.message
   end
+helper_method :pos
+    def pos
+      Po.find(1)
+    end
 end

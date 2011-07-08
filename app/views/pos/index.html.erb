@@ -1,59 +1,92 @@
-
-<div  id="app">
-    <div class="title">
-        <h1>Listing pos</h1>
-    </div>
-    <div class="content">
-        <div id="create-po"></div>
-        <div id="pos">
-            <ul id="po-list"></ul>
-        </div>
-    </div>
-</div>
-
-
-<table>
-  <tr>
-    <th>Needed</th>
-    <th>Vendor</th>
-    <th>User</th>
-    <th>Approved</th>
-    <th>Confirmed</th>
-    <th>Amount</th>
-    <th>Paid</th>
-    <th></th>
-    <th></th>
-    <th></th>
-  </tr>
-
-<% @pos.each do |po| %>
-  <tr>
-    <td><%= po.needed %></td>
-    <td><%= po.vendor_id %></td>
-    <td><%= User.find(po.user_id).email %></td>
-    <td><% if po.approved.blank? %>
-        Not yet approved
-        <% else %>
-        <%= User.find(po.approved).email %>
-        <% end %>
-        </td>
-    <td>
-        <% if po.confirmed.blank? %>
-        Not yet confirmed
-        <% else %>
-        <%= User.find(po.confirmed).email %>
-       <% end  %>
-
-    </td>
-    <td><%= po.amount %></td>
-    <td><%= po.paid %></td>
-    <td><%= link_to 'Show', po %></td>
-    <td><%= link_to 'Edit', edit_po_path(po) %></td>
-    <td><%= link_to 'Destroy', po, :confirm => 'Are you sure?', :method => :delete %></td>
-  </tr>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Interfaith</title>
+  <%= stylesheet_link_tag :all %>
+  <%= include_javascripts :interfaith %>
+  <%= csrf_meta_tag %>
+<script>
+Pos.reset(<%= @pos.to_json %>);
+</script>
+<% if current_user %>
+<script>
+interfaith = {"user_id": <%= current_user.id %>, "email": "<%= current_user.email %>", "roles": "<%= current_user.roles[0].name %>"};
+</script>  
 <% end %>
-</table>
 
-<br />
+</head>
+<body>
+  <div id="app">
+    <p class="notice"><%= notice %></p>
+    <p class="alert"><%= alert %></p>
+    <% if !current_user %>
+    <div id="sign_in_over">
+      <div id="sign_in_form" class="cf">
+        <div class="cf" style="height:25%"></div>
+        <div class="cf">
+          <h1>Interfaith PO System</h1>
+          <p>Welcome to Interfaith's PO system. Please sign in to continue.</p>
+          <input id="signinemail" type="text" placeholder="Email Address" autocomplete="off" />
+          <br/>
+          <input id="signinpw" type="password" placeholder="Password" autocomplete="off"/>
+          <br/>
+          <div class="remember_me">
+          <span>Remember me</span>
+          <input type="checkbox" name="remember_me" />
+          </div>
+        </div>
+          <div id="signinlogin" class="button blue">Sign In</div>
+      </div>
+      </div>
+    <% end %>
+    <div id="top" class="cf">
+      <div class="top-header">
+        <h4><a href="#">Interfaith</a></h4>
+        <ul>
+          <% if user_signed_in? %>
+            <li>Signed in as <%= current_user.email %>. Not you?</li>
+            <li id="signout">Sign Out</li>
+          <% else %>
+            <li id="sign_up">Sign Up</li><li id="sign_in">Sign In</li>
+          <% end %>
+        </ul>
 
-<%= link_to 'New Po', new_po_path %>
+      </div>
+      <% if user_signed_in? %>
+      <div class="nav">
+        <ul>
+        <li id="po-click"><a href="/#po">POs</a></li>
+        <li><a href="/#vendor">Vendors</a></li>
+        </ul>
+        <ul class="header-right"></ul>
+      </div>
+      <% end %>
+    </div>
+    <div id="middle" class="cf" <% if !user_signed_in? %> style="top:28px; border-top: 1px solid #999;" <% end %>>
+      <div class="left">
+        <h5 class="side-header">Accounting</h5>
+        <ul id="sidebar-list">
+        <li><a href="/#po">POs</a></li>
+        <li><a href="/#vendor">Vendors</a></li>
+        </ul>
+      </div>
+      <div class="right">
+          <div id="sub-right">
+          <div id="welcome">
+            <p>I'm sure some information will go here</p>
+            <p>Photos, maybe a video? I don't know if we'll have enough time</p>
+          </div>
+          <div id="vendor">
+            <ul id="resource-list"></ul>
+          </div>
+          <div id="po">
+            <ul id="resource-list"></ul>
+          </div>
+        </div>
+      
+      </div>
+    </div>
+    <div id="bottom"></div>
+  </div>
+</body>
+</html>

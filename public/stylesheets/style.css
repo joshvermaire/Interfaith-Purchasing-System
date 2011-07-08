@@ -251,6 +251,20 @@ height: 52px;
 	background: white;
 }
 
+#sub-right h1 {
+	border-bottom: 3px solid dimGray;
+    font-size: 25px;
+    margin: 10px auto;
+    padding: 10px 0 20px;
+    text-align: center;
+    color: #111;
+}
+
+#sub-right > p {
+	font-size: 16px;
+    padding: 10px;
+}
+
 #middle .right .side-header {
 	text-transform: none;
 	font-weight: 700;
@@ -267,7 +281,8 @@ height: 52px;
 	border-bottom: 1px solid #DEDEDE;
     border-left: 1px solid #DEDEDE;
     border-right: 1px solid #DEDEDE;
-	padding: 13px 20px;
+	line-height: 35px;
+    padding: 0 20px;
 	color: #333;
 	cursor: pointer;
 }
@@ -311,6 +326,25 @@ div.form label, div.form span {
 .po-vendor, .po-date, .po-user, .po-amount {
 	width: 250px;
 
+}
+
+.resource-list li div.approved {
+	background: #598DA3;
+	border-radius: 5px;
+	color: #F1F1F1;
+	padding: 0 7px;
+	margin: 4px;
+	line-height: 26px;
+	height: 26px;
+}
+
+.resource-list li:hover div.approved {
+	background: #F1F1F1;
+	color: #598DA3;
+}
+
+.resource-list li div.approved:hover {
+	background: #F4FCE8;
 }
 
 #po {
