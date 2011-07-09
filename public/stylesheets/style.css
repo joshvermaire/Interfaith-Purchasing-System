@@ -474,3 +474,51 @@ div.form label, div.form span {
 #signinlogin {
 	margin: 5px 20px;
 }
+
+/* Thoughts for styles */
+
+/*
+
+From https://developer.mozilla.org/en/JavaScript/Getting_Started
+
+h2 {
+	margin: 0 20px 0 0;
+	color: #666;
+	font: 200 20px/1.1 "Bebas Neue", "League Gothic", Haettenschweiler, "Arial Narrow", sans-serif;
+	text-transform: uppercase;
+	letter-spacing: .5px;
+}
+
+#page-files .add a.disabled {
+opacity: .75;
+background-color: #C8E6ED;
+}
+
+#page-files .add a {
+background: #A5D9F3 url("img/button-attach.png") 0 50% repeat-x;
+}
+
+.page-meta p.add a, #deki-page-tags-toggleview {
+display: inline-block;
+padding: 8px 10px 6px 32px;
+background-color: #A5D9F3;
+color: #333;
+font: 200 15px/1 "Bebas Neue", "League Gothic", Haettenschweiler, "Arial Narrow", sans-serif;
+text-transform: uppercase;
+letter-spacing: .5px;
+border: 0;
+-moz-border-radius: 3px;
+-webkit-border-radius: 3px;
+border-radius: 3px;
+-moz-box-shadow: 1px 1px 0 rgba(0, 0, 0, .25);
+-webkit-box-shadow: 1px 1px 0 rgba(0, 0, 0, .25);
+box-shadow: 1px 1px 0 rgba(0, 0, 0, .25);
+}
+
+a.disabled, a.disabled:link, a.disabled:visited, a.disabled:hover {
+text-decoration: none;
+color: #888;
+cursor: default;
+}
+
+*/

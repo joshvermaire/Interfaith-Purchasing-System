@@ -6,6 +6,6 @@ class ApplicationController < ActionController::Base
   end
 helper_method :pos
     def pos
-      Po.find(1)
+      Po.find(:all, :limit => 20)
     end
 end

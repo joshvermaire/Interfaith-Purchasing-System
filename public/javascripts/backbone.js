@@ -1,11 +1,11 @@
 $(function() {
-
+    // Create basic variables and functions
     server = "http://localhost:3000/";
     loggedIn = function() {
-        if (interfaith.user_id) {
-            return true;
-        } else {
+        if (typeof(interfaith) == "undefined") {
             return false;
+        } else {
+            return true;
         }
     };
 
@@ -58,11 +58,10 @@ $(function() {
     Vendors = new VendorList;
 
 
-    ResourceView = Backbone.View.extend({
+    App.View.Resource = Backbone.View.extend({
 
         initialize: function() {
           _.bindAll(this, 'render', 'vendor', 'approved', 'navigate');
-          //this.model.bind("change:approved", console.log(this.model));
         },
 
         events: {
@@ -75,7 +74,12 @@ $(function() {
         tagName: "li",
 
         render: function() {
-            if (!this.model.get('user_id')) { this.model.set({user_id: "1"})}; 
+            if (!this.model.get('user_id')) {
+                this.model.set({
+                    user_id: "1"
+                });
+            }
+
             var jmodel = this.model.toJSON();
 
             if(this.model.collection == Pos) {
@@ -83,18 +87,22 @@ $(function() {
                 jmodel.user = jmodel.user || Users.get(jmodel.user_id).toJSON();
                 var interfaith = interfaith || {};
                 interfaith.user_id = interfaith.user_id || 1;
+
                 if (!jmodel.approved && interfaith.user_id == 1) {
                     jmodel.approved = '<div class="approved cf">Approve</div>';
                 } else {
                     jmodel.approved = '<div style="height:34px;width:85px;"></div>';
-                };
+                }
+
                 if (!jmodel.confirmed && interfaith.user_id == 1) {
                     jmodel.confirmed = '<div class="confirmed cf">Confirm</div>';
                 } else {
                     jmodel.confirmed = '<div style="height:34px;width:85px;"></div>';
                 }
             }
+
             $(this.el).html(JST[this.options.template](jmodel));
+            
             return this;    
         },
 
@@ -104,30 +112,40 @@ $(function() {
         approved: function() {
             var interfaith = interfaith || {};
             interfaith.user_id = interfaith.user_id || 1;
-            this.model.unset("vendors");
-            this.model.save({approved: interfaith.user_id});
+
+            this.model.save({
+                approved: interfaith.user_id
+            });
+
             var hash = window.location.hash;
             if (hash == '#po/approve' || hash == '#po/confirm') {
                 this.$('.approved').fadeOut();
             } else {
-            var self = this;
-            $(this.el).fadeOut(750, function() { self.remove()});
-            };
+                var self = this;
+                $(this.el).fadeOut(750, function() {
+                    self.remove();
+                });
+            }
 
         },
 
         confirmed: function() {
             var interfaith = interfaith || {};
             interfaith.user_id = interfaith.user_id || 1;
-            this.model.unset("vendors");
-            this.model.save({confirmed: interfaith.user_id});
+
+            this.model.save({
+                confirmed: interfaith.user_id
+            });
+
             var hash = window.location.hash;
             if (hash == '#po/approve' || hash == '#po/confirm') {
                 this.$('.confirmed').fadeOut();
             } else {
-            var self = this;
-            $(this.el).fadeOut(750, function() { self.remove()});
-            };
+                var self = this;
+                $(this.el).fadeOut(750, function() {
+                    self.remove();
+                });
+            }
 
         },
 
@@ -135,9 +153,9 @@ $(function() {
             if (e.target.className == "approved") return;
             var hash = window.location.hash;
             if (hash == "#po" || hash == "#vendor") {
-                App.navigate(hash + '/' + this.model.id, true);
+                App.Router.navigate(hash + '/' + this.model.id, true);
             } else {
-                App.navigate("#po/" + this.model.id, true);
+                App.Router.navigate("#po/" + this.model.id, true);
             }
         }
 
@@ -159,7 +177,9 @@ $(function() {
             this.type = o.type || "vendor";
             this.collection = this.options.collection;
             this.attrib = o.attrib || "name";
+            
             _.bindAll(this, 'render', 'check');
+
             this.render();
             
         },
@@ -169,16 +189,17 @@ $(function() {
                 "attrib" : this.attrib,
                 "collection" : this.collection,
                 "type" : this.type
-                
             }));
+
             $(".datepicker").datepicker();
+            
             return this;   
         },
 
         create: function() {
             if (this.type == "vendor") {
                 this.collection.create({
-                name: $('.resource-vendor [name=name]').val()
+                    name: $('.resource-vendor [name=name]').val()
                 });
 
                 $('[name=name]').val('');
@@ -187,7 +208,7 @@ $(function() {
             
                 var name = $('.resource-po [name=name]').val();
                 var vendor_id = Vendors.find(function(po) {
-                        return po.get("name") === name;
+                    return po.get("name") === name;
                 });
                 vendor_id = vendor_id.id;
                 var amount = $('.resource-po [name=amount]').val();
@@ -199,14 +220,15 @@ $(function() {
                         needed: date_needed,
                         amount: amount,
                         user_id: interfaith.user_id
-                    }, {error: function(model, error) {
-                        console.log(model);
-                        console.log(error);
+                    }, {
+                        error: function(model, error) {
+                            console.log(model);
+                            console.log(error);
                         }
                     });
                 }
             }
-            location.hash = "/"
+            location.hash = "/";
         },
 
         check: function(event) {
@@ -218,16 +240,17 @@ $(function() {
 
             if (search === '') return;
 
-            Vendors.chain()
-                .sortBy(function(model){ return model.attributes.name; })
-                .each(function(model) {
-                    var string = model.attributes.name.toLowerCase();
+            Vendors.chain().sortBy(
 
-                    var chara = string.indexOf(search);
-                    if (chara >= 0) {
-                        self.addResult(model);
-                    }
-                });
+            function(model){ 
+                return model.attributes.name;
+            }).each(function(model) {
+                var string = model.attributes.name.toLowerCase();
+                var chara = string.indexOf(search);
+                if (chara >= 0) {
+                    self.addResult(model);
+                }
+            });
         },
 
         addResult: function(model) {
@@ -242,10 +265,14 @@ $(function() {
        initialize: function() {
             _.bindAll(this, "render");
             this.data = this.model || {};
-            if ($.isEmptyObject(this.data) == false ) {this.data = this.data.toJSON()};
+            if ($.isEmptyObject(this.data) === false) {
+                this.data = this.data.toJSON();
+            }
             //this.template = this.options.template;
-            if (this.model && !this.model.get('user_id')) { 
-                this.model.set({user_id: "1"}) 
+            if (this.model && !this.model.get('user_id')) {
+                this.model.set({
+                    user_id: "1"
+                });
                 this.data = this.model.toJSON();
                 if (this.model.template == "po") {
                     this.data.vendor = this.data.vendor || Vendors.get(this.data.vendor_id).toJSON();
@@ -253,7 +280,7 @@ $(function() {
                 }
             }
             this.render();
-       },
+        },
 
        render: function() {
            $(this.el).html(JST[this.options.template](this.data));
@@ -278,19 +305,22 @@ $(function() {
         initialize: function() {
             _.bindAll(this, 'addOne', 'addAll');
 
-            Pos.bind('add', this.addOne);
+            //Pos.bind('add', this.addOne);
             //Pos.bind('reset', this.addAll);
             //Vendors.bind('add', this.addOne);
             //Vendors.bind('reset', this.addAll);
             
-            bottomView = new SimpleView({el: $("#bottom"), template: "footer"});
+            bottomView = new SimpleView({
+                el: $("#bottom"),
+                template: "footer"
+            });
 
         },
 
         click: function(e) {
             //console.log(e);
             //var jhref = e.target.href.substr(22);
-            //App.navigate( e.target.href.substr(22), true);
+            //App.Router.navigate( e.target.href.substr(22), true);
             //console.log(this);
             //return false;
         },
@@ -300,20 +330,23 @@ $(function() {
         },
 
         signInForm: function() {
-            //e.stopPropogation();
-            App.navigate('users/sign_in');
+            App.Router.navigate('users/sign_in');
             $("#sign_in_over").fadeIn();
             //$("#sign_in_over").show("slide", {direction: "right" }, 750);  //Changed from #sign_in_form
         },
 
         signInFormClose: function() {
             //$("#sign_in_form").hide("slide", {direction: "right" }, 500);
-            App.navigate('');
+            App.Router.navigate('');
             $("#sign_in_over").fadeOut();
         },
 
         addOne: function(res) {
-            var view = new ResourceView({model: res, template: res.template});
+            var view = new App.View.Resource({
+                model: res,
+                template: res.template
+            });
+            
             this.$("#sub-right #resource-list").append(view.render().el);
         },
 
@@ -327,22 +360,28 @@ $(function() {
                     email: $("#signinemail").val(),
                     password: $("#signinpw").val(),
                     remember_me: $("#sign_in_form [name=remember_me]").val()
-                    }
+                }
             };
-            var url = server + "users/sign_in.json";
+
             currentUser = new CurrentUser();
+            
+            var url = server + "users/sign_in.json";
             currentUser.url = url;
-            currentUser.save(login, { success: function(model, response) {
-                            window.location = server;
-                        }, error: function(model,  response) {
-                            console.log(model);
-                            console.log(response);
-                        }});
+            
+            currentUser.save(login, {
+                success: function(model, response) {
+                    window.location = server;
+                },
+                error: function(model, response) {
+                    console.log(model);
+                    console.log(response);
+                }
+            });
 
         },
 
         logout: function() {
-            App.navigate('users/sign_out');
+            App.Router.navigate('users/sign_out');
             var url = server + "users/sign_out.json";
             currentUser = new Backbone.Model;
             currentUser.url = url;
@@ -360,7 +399,7 @@ $(function() {
     AppRouter = Backbone.Router.extend({
 
         initialize: function() {
-            //MainView = new AppView();
+            MainView = new AppView();
             //_.extend(, this.routes)
             this.navigate('');
         },
@@ -389,8 +428,14 @@ $(function() {
         }, 
 
         index: function() {
-            var num = Pos.filter(function(model) { return model.get('approved') == null});
-            $('#sub-right').html('<h1>WELCOME, friend</h1><p>You have ' + num.length + ' POs waiting to be approved.</p>');
+            if (loggedIn()) {
+                var num = Pos.filter(function(model) {
+                    return model.get('approved') === null;
+                });
+                $('#sub-right').html('<h1>WELCOME, ' + interfaith.email + '</h1><p>You have ' + num.length + ' POs waiting to be approved.</p>');
+            } else {
+                $('#sub-right').html('<h1>Log in mothabrotha</h1>');
+            }
         },
 
         resourcePo: function() {
@@ -400,50 +445,85 @@ $(function() {
         },
 
         newPo: function() {
-            new NewResourceView({model: new Po(), type: "po", collection: Pos, template: "newPo", attrib: "vendor" });
+            new NewResourceView({
+                model: new Po(),
+                type: "po",
+                collection: Pos,
+                template: "newPo",
+                attrib: "vendor"
+            });
         },
 
         approvePo: function() {
             $('#sub-right').html('<div class="header cf"><div class="po-vendor">Vendor Name</div><div class="po-date">Date Needed</div><div class="po-user">User Email</div><div class="po-amount">Amount</div></div><ul id="resource-list" class="resource-list"></ul>');
             Pos.template = "po";
-            var num = Pos.filter(function(model) { return model.get('approved') == null});
-            var nums = _.each(num, function(n) { MainView.addOne(n); });
+            
+            var num = Pos.filter(function(model) {
+                return model.get('approved') === null;
+            });
+            
+            var nums = _.each(num, function(n) {
+                MainView.addOne(n);
+            });
 
         },
 
         confirmPo: function() {
             $('#sub-right').html('<div class="header cf"><div class="po-vendor">Vendor Name</div><div class="po-date">Date Needed</div><div class="po-user">User Email</div><div class="po-amount">Amount</div></div><ul id="resource-list" class="resource-list"></ul>');
             Pos.template = "po";
-            var num = Pos.filter(function(model) { return model.get('confirmed') == null});
-            var nums = _.each(num, function(n) { MainView.addOne(n); });
+
+            var num = Pos.filter(function(model) {
+                return model.get('confirmed') === null;
+            });
+            
+            var nums = _.each(num, function(n) {
+                MainView.addOne(n);
+            });
 
         },
 
         showPo: function(id) {
-            var po = new Po({id: id});
+            var po = new Po({
+                id: id
+            });
+            
             po.fetch({
                 success: function(model, resp) {
                     var approve_name, confirm_name, appNum, confNum;
                     appNum = model.get('approved');
                     confNum = model.get('confirmed');
+                    
                     if (appNum) {
                         approve_name = Users.get(appNum).get('email') || null;
-                    };
+                    }
+                    
                     if (confNum) {
                         confirm_name = Users.get(confNum).get('email') || null;
-                    };
+                    }
+
                     if (approve_name) {
                         approve_name = "This PO approved by: " + approve_name;
                     } else {
                         approve_name = '<div class="approved">Approve</div>';
                     }
+                    
                     if (confirm_name) {
                         confirm_name = "This PO confirmed by: " + confirm_name;
                     } else {
                         confirm_name = '<div class="confirmed">Confirm</div>';
-                    };
-                    po.set({aname: approve_name, cname: confirm_name});
-                    new SimpleView({model: po, el: $("#sub-right"), template: "viewPo"});
+                    }
+                    
+                    po.set({
+                        aname: approve_name,
+                        cname: confirm_name
+                    });
+                    
+                    new SimpleView({
+                        model: po,
+                        el: $("#sub-right"),
+                        template: "viewPo"
+                    });
+                    
                     //view.el.html(view.render());
                 },
                 error: function(model, resp) {
@@ -466,10 +546,17 @@ $(function() {
         },
 
         showVendor: function(id) {
-            var vendor = new Vendor({id: id});
+            var vendor = new Vendor({
+                id: id
+            });
+            
             vendor.fetch({
                 success: function(model, resp) {
-                    new SimpleView({model: vendor, el: $("#sub-right"), template: "viewVendor"});
+                    new SimpleView({
+                        model: vendor,
+                        el: $("#sub-right"),
+                        template: "viewVendor"
+                    });
                     //view.el.html(view.render());
                 },
                 error: function(model, resp) {
@@ -493,15 +580,10 @@ $(function() {
         }
 
     });
-    Pos.fetch();
+
     Vendors.fetch();
     Users.fetch();
-    MainView = new AppView();
-    _.defer(function() {
-        App = new AppRouter();
-        Backbone.history.start();
-    });
-    //MainView = new AppView();
+
     //Backbone.history.start({pushState: true});
     
 });

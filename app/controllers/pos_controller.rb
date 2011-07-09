@@ -49,7 +49,7 @@ class PosController < ApplicationController
     @po = Po.find(params[:id])
     #authorize! :update, @po
 
-    @po.update_attributes pick(params, :approved)
+    @po.update_attributes pick(params, :approved, :confirmed)
     respond_with @po
   end
 
