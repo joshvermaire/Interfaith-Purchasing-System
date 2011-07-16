@@ -8,23 +8,19 @@ $(function() {
             return true;
         }
     };
+    var msg = function(msg) {
+        var bubble = $("#app .msg").html(msg);
+        bubble.fadeIn('slow').delay(1000).fadeOut('fast');
+    };
 
     // Set up current models
     Po = Backbone.Model.extend({
-        url: function() {
-            var base = 'pos';
-            if (this.isNew()) return base;
-            return base + (base.charAt(base.length - 1) == '/' ? '' : '/') + this.id;
-        },
+        urlRoot : '/pos',
         template : "po",
     });
     User = Backbone.Model.extend();
     Vendor = Backbone.Model.extend({
-        url: function() {
-            var base = 'vendors';
-            if (this.isNew()) return base;
-            return base + (base.charAt(base.length - 1) == '/' ? '' : '/') + this.id;
-        },
+        urlRoot : '/vendors',
         template: "vendor"
     });
 
@@ -53,14 +49,13 @@ $(function() {
     App.View.Resource = Backbone.View.extend({
 
         initialize: function() {
-            _.bindAll(this, 'render', 'vendor', 'approved', 'navigate');
+            _.bindAll(this, 'render', 'vendor');
         },
 
         events: {
             "click .po-vendor"   : "vendor",
-            "click .approved"    : "approved",
+            //"click .approved"    : "approved",
             "click .confirmed"   : "confirmed",
-            "click"              : "navigate",
         },
 
         tagName: "li",
@@ -81,15 +76,15 @@ $(function() {
                 interfaith.user_id = interfaith.user_id || 1;
 
                 if (!jmodel.approved && interfaith.user_id == 1) {
-                    jmodel.approved = '<div class="approved cf">Approve</div>';
+                    jmodel.approved = '<a class="approved button" href="/#'+this.model.template+'/'+jmodel.id+'/approved"><span class="check icon"></span>Approve</a>';
                 } else {
-                    jmodel.approved = '<div style="height:34px;width:85px;"></div>';
+                    jmodel.approved = '<a style="height:20px;width:81px; display:inline-block; "></a>';
                 }
 
                 if (!jmodel.confirmed && interfaith.user_id == 1) {
-                    jmodel.confirmed = '<div class="confirmed cf">Confirm</div>';
+                    jmodel.confirmed = '<a class="confirmed button positive"><span class="check icon"></span>Confirm</a>';
                 } else {
-                    jmodel.confirmed = '<div style="height:34px;width:85px;"></div>';
+                    jmodel.confirmed = '<a style="height:20px;width:81px; display:inline-block; "></a>';
                 }
             }
 
@@ -100,25 +95,7 @@ $(function() {
 
         vendor: function() {},
 
-        approved: function() {
-            var interfaith = interfaith || {};
-            interfaith.user_id = interfaith.user_id || 1;
-
-            this.model.save({
-                approved: interfaith.user_id
-            });
-
-            var hash = window.location.hash;
-            if (hash == '#po/approve' || hash == '#po/confirm') {
-                this.$('.approved').fadeOut();
-            } else {
-                var self = this;
-                $(this.el).fadeOut(750, function() {
-                    self.remove();
-                });
-            }
-
-        },
+        
 
         confirmed: function() {
             var interfaith = interfaith || {};
@@ -140,7 +117,7 @@ $(function() {
 
         },
 
-        navigate: function(e) {
+        /*navigate: function(e) {
             if (e.target.className == "approved") return;
             var hash = window.location.hash;
             if (hash == "#po" || hash == "#vendor") {
@@ -148,13 +125,13 @@ $(function() {
             } else {
                 App.Router.navigate("#po/" + this.model.id, true);
             }
-        }
+        } */
 
     });
 
 
 
-    NewResourceView = Backbone.View.extend({
+    App.View.NewResource = Backbone.View.extend({
         el: $("#middle #sub-right"),
 
         events: {
@@ -280,7 +257,7 @@ $(function() {
     });
 
     /* Set up main app view */
-    AppView = Backbone.View.extend({
+    App.View.App = Backbone.View.extend({
 
         el: $("#app"),
 
@@ -392,7 +369,7 @@ $(function() {
     AppRouter = Backbone.Router.extend({
 
         initialize: function() {
-            MainView = new AppView();
+            MainView = new App.View.App();
             //_.extend(, this.routes)
             this.navigate('');
         },
@@ -405,6 +382,7 @@ $(function() {
             "po/new"     : "newPo",
             "po/approve" : "approvePo",
             "po/confirm" : "confirmPo",
+            "po/:id/approved" : "approvedPo",
             "po/:id"     : "showPo",
 
             /* Vendor Routes */
@@ -438,7 +416,7 @@ $(function() {
         },
 
         newPo: function() {
-            new NewResourceView({
+            new App.View.NewResource({
                 type       : "po",
                 model      : new Po(),
                 attrib     : "vendor",
@@ -473,6 +451,20 @@ $(function() {
                 MainView.addOne(n);
             });
 
+        },
+
+
+        approvedPo: function(id) {
+            var interfaith = interfaith || {};
+            interfaith.user_id = interfaith.user_id || 1;
+
+            var po = new Po({
+                id: id
+            });
+
+            po.save({
+                approved: interfaith.user_id
+            });
         },
 
         showPo: function(id) {
@@ -535,7 +527,7 @@ $(function() {
         },
 
         newVendor: function() {
-            new NewResourceView({
+            new App.View.NewResource({
                 model      : new Vendor(),
                 template   : "newVendor",
                 collection : Vendors,

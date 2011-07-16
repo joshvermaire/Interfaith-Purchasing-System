@@ -25,6 +25,7 @@ interfaith = {"user_id": <%= current_user.id %>, "email": "<%= current_user.emai
 </head>
 <body>
   <div id="app">
+  <p class="msg" style="display:none"></p>
     <p class="notice"><%= notice %></p>
     <p class="alert"><%= alert %></p>
     <% if !current_user %>
@@ -71,13 +72,6 @@ interfaith = {"user_id": <%= current_user.id %>, "email": "<%= current_user.emai
       <% end %>
     </div>
     <div id="middle" class="cf" <% if !user_signed_in? %> style="top:28px; border-top: 1px solid #999;" <% end %>>
-      <div class="left">
-        <h5 class="side-header">Accounting</h5>
-        <ul id="sidebar-list">
-        <li><a href="/#po">POs</a></li>
-        <li><a href="/#vendor">Vendors</a></li>
-        </ul>
-      </div>
       <div class="right">
           <div id="sub-right">
           <div id="welcome">

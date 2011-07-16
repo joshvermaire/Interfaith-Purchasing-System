@@ -1,9 +1,11 @@
 <div id="po">
-	<div class="po-vendor"><a href="/#vendor/<%= vendor_id %>"><%= vendor.name %></a></div>
+	<div class="po-vendor"><a class="button" href="/#vendor/<%= vendor_id %>"><%= vendor.name %></a></div>
 	<div class="po-date"><%= needed %></div>
 	<div class="po-user"><%= user.email %></div>
 	<div class="po-amount"><%= amount %></div>
-	<%= approved %>
-	<%= confirmed %>
-	<span class="po-destroy"></span>
+	<div style="float:left">
+		<%= approved %>
+		<%= confirmed %>
+		<a href="#" class="button negative"><span class="icon cross"></span>Remove PO</a>
+	</div>
 </div>
