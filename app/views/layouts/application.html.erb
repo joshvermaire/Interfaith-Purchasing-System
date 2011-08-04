@@ -13,12 +13,12 @@
 </script>
 <script>
 $(function() {
-Pos.reset(<%= pos.to_json.html_safe %>);
+window.Pos.reset(<%= pos.to_json.html_safe %>);
 });
 </script>
 <% if current_user %>
 <script>
-interfaith = {"user_id": <%= current_user.id %>, "email": "<%= current_user.email %>", "roles": "<%= current_user.roles[0].name %>"};
+interfaith = {"user_id": <%= current_user.id %>, "email": "<%= current_user.email %>", "roles": "<%= current_user.roles[0].name %>", "can_approve": 1, "can_confirm": 1};
 </script>  
 <% end %>
 
