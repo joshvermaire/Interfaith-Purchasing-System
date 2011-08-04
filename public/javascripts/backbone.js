@@ -135,8 +135,8 @@ $(function() {
         el: $("#middle #sub-right"),
 
         events: {
-            "click div#po-submit"     : "create",
-            "click div#vendor-submit" : "create",
+            "click a#po-submit"     : "create",
+            "click a#vendor-submit" : "create",
             "keypress input"          : "check",
         },
 
@@ -159,7 +159,7 @@ $(function() {
                 "type"       : this.type,
             }));
 
-            $(".datepicker").datepicker();
+            //$(".datepicker").datepicker();
 
             return this;
         },
@@ -196,7 +196,7 @@ $(function() {
                     });
                 }
             }
-            location.hash = "/";
+            location.hash = "";
         },
 
         check: function(event) {
