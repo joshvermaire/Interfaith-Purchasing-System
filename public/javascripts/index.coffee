@@ -19,7 +19,7 @@ $ ->
 		urlRoot: "/pos"
 		template: "po"
 	
-	User = Backbone.Model.extend
+	User = Backbone.Model.extend()
 	
 	Vendor = Backbone.Model.extend
 		urlRoot: "/vendors"
@@ -28,6 +28,27 @@ $ ->
 	PoList = Backbone.Collection.extend
 		url: "/pos"
 		model: Po
+		initialize: ->
+			_.bindAll @, "approval"
+			@bind('reset', _.compose(@approval,@confirm))
+		
+		approval: ->
+			num = @filter((model) ->
+				model.get("approved") == null and model.get("confirmed") isnt interfaith.user_id and model.get("user_id") isnt interfaith.user_id
+			)
+			$('.po-approve-num').text(num.length)
+			if num.length == 0
+				$('.po-approve-num').css('display', 'none')
+			num
+
+		confirm: ->
+			num = @filter((model) ->
+				model.get("confirmed") == null and model.get("approved") isnt interfaith.user_id and model.get("user_id") isnt interfaith.user_id
+			)
+			$('.po-confirm-num').text(num.length)
+			if num.length == 0
+				$('.po-confirm-num').css('display', 'none')
+			num
 	
 	UserList = Backbone.Collection.extend
 		url: "/users"
@@ -38,10 +59,11 @@ $ ->
 		model: Vendor
 
 	window.Pos = new PoList
-	
 	window.Users = new UserList
+	Users.fetch()
 	
 	window.Vendors = new VendorList
+	Vendors.fetch()
 	
 	App.View.Resource = Backbone.View.extend
 		initialize: ->
@@ -70,7 +92,7 @@ $ ->
 				"<a style=\"height:20px;width:81px; display:inline-block; \"></a>"
 		
 		confirm: ->
-			if not @JSON.confirmed and interfaith.can_confirm == 1
+			if not @JSON.confirmed and interfaith.can_confirm == 1 and @JSON.approved isnt interfaith.user_id and @JSON.user_id isnt interfaith.user_id
 				"<a class=\"confirmed button positive\" href=\"/#" + @model.template + "/" + @JSON.id + "/confirmed\"><span class=\"check icon\"></span>Confirm</a>"
 			else
 				"<a style=\"height:20px;width:81px; display:inline-block; \"></a>"
@@ -142,14 +164,7 @@ $ ->
 	SimpleView = Backbone.View.extend(
 		initialize: ->
 			_.bindAll @, "render"
-			@data = @model or {}
-			@data = @data.toJSON()  if $.isEmptyObject(@data) == false
-			if @model and not @model.get("user_id")
-				@model.set user_id: "1"
-				@data = @model.toJSON()
-				if @model.template == "po"
-					@data.vendor = @data.vendor or Vendors.get(@data.vendor_id).toJSON()
-					@data.user = @data.user or Users.get(@data.user_id).toJSON()
+			@data = @model?.toJSON() or {}
 			@render()
 		
 		render: ->
@@ -187,7 +202,7 @@ $ ->
 			view = new App.View.Resource
 				model: resource
 				template: resource.template
-			@$("#resource-list").append view.render().el
+			$("#resource-list").append view.render().el
 		
 		addAll: (collection) ->
 			collection.each @addOne
@@ -240,11 +255,7 @@ $ ->
 		
 		index: ->
 			if isLoggedIn()
-				$("#sub-right").html "<h1>WELCOME, " + window.interfaith.email + "</h1><p>You have <span class='num'></span> POs waiting to be approved.</p>"
-				$('.num').html(
-					Pos.filter((model) ->
-						model.get("approved") == null
-					).length)
+				$("#sub-right").html "<h1>WELCOME, " + window.interfaith.email + "</h1><p>You have <span class='po-approve-num'></span> POs waiting to be approved.</p>"
 			else
 				$("#sub-right").html "<h1>Log in mothabrotha</h1>"
 		
@@ -261,24 +272,30 @@ $ ->
 			)
 		
 		approvePo: ->
-			$("#sub-right").html "<div class=\"header cf\"><div class=\"po-vendor\">Vendor Name</div><div class=\"po-date\">Date Needed</div><div class=\"po-user\">User Email</div><div class=\"po-amount\">Amount</div></div><ul id=\"resource-list\" class=\"resource-list\"></ul>"
 			Pos.template = "po"
-			num = Pos.filter((model) ->
-				model.get("approved") == null
-			)
-			nums = _.each(num, (n) ->
-				MainView.addOne n
-			)
+			num = Pos.approval()
+			if num.length
+				html =  "<div class=\"header cf\"><div class=\"po-vendor\">Vendor Name</div><div class=\"po-date\">Date Needed</div><div class=\"po-user\">User Email</div><div class=\"po-amount\">Amount</div></div><ul id=\"resource-list\" class=\"resource-list\"></ul>"
+				$('#sub-right').html html
+				nums = _.each(num, (model) ->
+					MainView.addOne model
+				)
+			else
+				html = "You have no POs needing to be approved at this time"
+				$("#sub-right").html html
 		
 		confirmPo: ->
-			$("#sub-right").html "<div class=\"header cf\"><div class=\"po-vendor\">Vendor Name</div><div class=\"po-date\">Date Needed</div><div class=\"po-user\">User Email</div><div class=\"po-amount\">Amount</div></div><ul id=\"resource-list\" class=\"resource-list\"></ul>"
 			Pos.template = "po"
-			num = Pos.filter((model) ->
-				model.get("confirmed") == null
-			)
-			nums = _.each(num, (n) ->
-				MainView.addOne n
-			)
+			num = Pos.confirm()
+			if num.length
+				html = "<div class=\"header cf\"><div class=\"po-vendor\">Vendor Name</div><div class=\"po-date\">Date Needed</div><div class=\"po-user\">User Email</div><div class=\"po-amount\">Amount</div></div><ul id=\"resource-list\" class=\"resource-list\"></ul>"
+				$("#sub-right").html html
+				nums = _.each(num, (model) ->
+					MainView.addOne model
+				)
+			else
+				html = "You have no POs needing to be confirmed at this time"
+				$("#sub-right").html html
 		
 		approvedPo: (id) ->
 			po = new Po(id: id)
@@ -311,9 +328,10 @@ $ ->
 					console.log resp
 		
 		showPo: (id) ->
-			po = new Po(id: id)
-			po.fetch 
+			showingPo = new Po(id: id)
+			showingPo.fetch
 				success: (model, resp) ->
+					console.log
 					appNum = model.get("approved")
 					confNum = model.get("confirmed")
 					approve_name = Users.get(appNum).get("email") or null  if appNum
@@ -326,20 +344,18 @@ $ ->
 						confirm_name = "This PO confirmed by: " + confirm_name
 					else
 						confirm_name = "<div class=\"confirmed\">Confirm</div>"
-					po.set 
+					showingPo.set 
 						aname: approve_name
 						cname: confirm_name
-					
 					new SimpleView
+						model: showingPo
 						el: $("#sub-right")
-						model: po
 						template: "viewPo"
-				
 				error: (model, resp) ->
 					console.log "Error showPo"
 					console.log model
-					console.log resp
-		
+					console.log resp	
+
 		resourceVendor: ->
 			$("#sub-right").html "<div class='header cf'><div class='po-vendor'>Vendor Name</div><div class='po-amount'>Approved</div></div><ul id='resource-list' class='resource-list'></ul>"
 			Vendors.template = "vendor"
@@ -359,8 +375,6 @@ $ ->
 						model: vendor
 						el: $("#sub-right")
 						template: "viewVendor"
-					
-				
 				error: (model, resp) ->
 					console.log "Error showResource"
 					console.log model
@@ -374,8 +388,8 @@ $ ->
 		fourohfour: (path) ->
 			alert path + " 404 baby"
 	)
-	Users.fetch()
-	Vendors.fetch()
-	Pos.fetch()
+	#Users.fetch()
+	#Vendors.fetch()
+	#Pos.fetch()
 	App.Router = new AppRouter()
 	MainView = new App.View.App()

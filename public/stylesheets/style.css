@@ -337,13 +337,29 @@ div.form label, div.form span {
     text-decoration: none;
 }
 
-#bottom ul li a {
+#bottom li {
+	float: left;
+}
+
+#bottom a {
+	position:relative;
 	height: 37px;
 	line-height: 37px;
-	float:left;
 	margin-right: 10px;
-	padding: 0 10px;
+	padding: 10px;
 	text-decoration: none;
+}
+
+#bottom .po-approve-num, #bottom .po-confirm-num {
+	position: absolute;
+	color: white;
+	background: #212625;
+	border-radius: 2px;
+	top: 0;
+	height: 15px;
+	line-height: 15px;
+	padding: 1px;
+	right: 0;
 }
 
 #sign_in_over {

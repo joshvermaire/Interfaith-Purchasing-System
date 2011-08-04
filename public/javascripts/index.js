@@ -21,14 +21,40 @@
       urlRoot: "/pos",
       template: "po"
     });
-    User = Backbone.Model.extend;
+    User = Backbone.Model.extend();
     Vendor = Backbone.Model.extend({
       urlRoot: "/vendors",
       template: "vendor"
     });
     PoList = Backbone.Collection.extend({
       url: "/pos",
-      model: Po
+      model: Po,
+      initialize: function() {
+        _.bindAll(this, "approval");
+        return this.bind('reset', _.compose(this.approval, this.confirm));
+      },
+      approval: function() {
+        var num;
+        num = this.filter(function(model) {
+          return model.get("approved") === null && model.get("confirmed") !== interfaith.user_id && model.get("user_id") !== interfaith.user_id;
+        });
+        $('.po-approve-num').text(num.length);
+        if (num.length === 0) {
+          $('.po-approve-num').css('display', 'none');
+        }
+        return num;
+      },
+      confirm: function() {
+        var num;
+        num = this.filter(function(model) {
+          return model.get("confirmed") === null && model.get("approved") !== interfaith.user_id && model.get("user_id") !== interfaith.user_id;
+        });
+        $('.po-confirm-num').text(num.length);
+        if (num.length === 0) {
+          $('.po-confirm-num').css('display', 'none');
+        }
+        return num;
+      }
     });
     UserList = Backbone.Collection.extend({
       url: "/users",
@@ -40,7 +66,9 @@
     });
     window.Pos = new PoList;
     window.Users = new UserList;
+    Users.fetch();
     window.Vendors = new VendorList;
+    Vendors.fetch();
     App.View.Resource = Backbone.View.extend({
       initialize: function() {
         _.bindAll(this, "render");
@@ -71,7 +99,7 @@
         }
       },
       confirm: function() {
-        if (!this.JSON.confirmed && interfaith.can_confirm === 1) {
+        if (!this.JSON.confirmed && interfaith.can_confirm === 1 && this.JSON.approved !== interfaith.user_id && this.JSON.user_id !== interfaith.user_id) {
           return "<a class=\"confirmed button positive\" href=\"/#" + this.model.template + "/" + this.JSON.id + "/confirmed\"><span class=\"check icon\"></span>Confirm</a>";
         } else {
           return "<a style=\"height:20px;width:81px; display:inline-block; \"></a>";
@@ -163,21 +191,9 @@
     });
     SimpleView = Backbone.View.extend({
       initialize: function() {
+        var _ref;
         _.bindAll(this, "render");
-        this.data = this.model || {};
-        if ($.isEmptyObject(this.data) === false) {
-          this.data = this.data.toJSON();
-        }
-        if (this.model && !this.model.get("user_id")) {
-          this.model.set({
-            user_id: "1"
-          });
-          this.data = this.model.toJSON();
-          if (this.model.template === "po") {
-            this.data.vendor = this.data.vendor || Vendors.get(this.data.vendor_id).toJSON();
-            this.data.user = this.data.user || Users.get(this.data.user_id).toJSON();
-          }
-        }
+        this.data = ((_ref = this.model) != null ? _ref.toJSON() : void 0) || {};
         return this.render();
       },
       render: function() {
@@ -219,7 +235,7 @@
           model: resource,
           template: resource.template
         });
-        return this.$("#resource-list").append(view.render().el);
+        return $("#resource-list").append(view.render().el);
       },
       addAll: function(collection) {
         return collection.each(this.addOne);
@@ -281,10 +297,7 @@
       },
       index: function() {
         if (isLoggedIn()) {
-          $("#sub-right").html("<h1>WELCOME, " + window.interfaith.email + "</h1><p>You have <span class='num'></span> POs waiting to be approved.</p>");
-          return $('.num').html(Pos.filter(function(model) {
-            return model.get("approved") === null;
-          }).length);
+          return $("#sub-right").html("<h1>WELCOME, " + window.interfaith.email + "</h1><p>You have <span class='po-approve-num'></span> POs waiting to be approved.</p>");
         } else {
           return $("#sub-right").html("<h1>Log in mothabrotha</h1>");
         }
@@ -302,26 +315,34 @@
         });
       },
       approvePo: function() {
-        var num, nums;
-        $("#sub-right").html("<div class=\"header cf\"><div class=\"po-vendor\">Vendor Name</div><div class=\"po-date\">Date Needed</div><div class=\"po-user\">User Email</div><div class=\"po-amount\">Amount</div></div><ul id=\"resource-list\" class=\"resource-list\"></ul>");
+        var html, num, nums;
         Pos.template = "po";
-        num = Pos.filter(function(model) {
-          return model.get("approved") === null;
-        });
-        return nums = _.each(num, function(n) {
-          return MainView.addOne(n);
-        });
+        num = Pos.approval();
+        if (num.length) {
+          html = "<div class=\"header cf\"><div class=\"po-vendor\">Vendor Name</div><div class=\"po-date\">Date Needed</div><div class=\"po-user\">User Email</div><div class=\"po-amount\">Amount</div></div><ul id=\"resource-list\" class=\"resource-list\"></ul>";
+          $('#sub-right').html(html);
+          return nums = _.each(num, function(model) {
+            return MainView.addOne(model);
+          });
+        } else {
+          html = "You have no POs needing to be approved at this time";
+          return $("#sub-right").html(html);
+        }
       },
       confirmPo: function() {
-        var num, nums;
-        $("#sub-right").html("<div class=\"header cf\"><div class=\"po-vendor\">Vendor Name</div><div class=\"po-date\">Date Needed</div><div class=\"po-user\">User Email</div><div class=\"po-amount\">Amount</div></div><ul id=\"resource-list\" class=\"resource-list\"></ul>");
+        var html, num, nums;
         Pos.template = "po";
-        num = Pos.filter(function(model) {
-          return model.get("confirmed") === null;
-        });
-        return nums = _.each(num, function(n) {
-          return MainView.addOne(n);
-        });
+        num = Pos.confirm();
+        if (num.length) {
+          html = "<div class=\"header cf\"><div class=\"po-vendor\">Vendor Name</div><div class=\"po-date\">Date Needed</div><div class=\"po-user\">User Email</div><div class=\"po-amount\">Amount</div></div><ul id=\"resource-list\" class=\"resource-list\"></ul>";
+          $("#sub-right").html(html);
+          return nums = _.each(num, function(model) {
+            return MainView.addOne(model);
+          });
+        } else {
+          html = "You have no POs needing to be confirmed at this time";
+          return $("#sub-right").html(html);
+        }
       },
       approvedPo: function(id) {
         var po;
@@ -374,13 +395,14 @@
         });
       },
       showPo: function(id) {
-        var po;
-        po = new Po({
+        var showingPo;
+        showingPo = new Po({
           id: id
         });
-        return po.fetch({
+        return showingPo.fetch({
           success: function(model, resp) {
             var appNum, approve_name, confNum, confirm_name;
+            console.log;
             appNum = model.get("approved");
             confNum = model.get("confirmed");
             if (appNum) {
@@ -399,13 +421,13 @@
             } else {
               confirm_name = "<div class=\"confirmed\">Confirm</div>";
             }
-            po.set({
+            showingPo.set({
               aname: approve_name,
               cname: confirm_name
             });
             return new SimpleView({
+              model: showingPo,
               el: $("#sub-right"),
-              model: po,
               template: "viewPo"
             });
           },
@@ -457,11 +479,6 @@
         return alert(path + " 404 baby");
       }
     });
-    Users.fetch();
-    Vendors.fetch();
-    Pos.fetch(success(a, b)(function() {}), $('.num').length && App.Router && isLoggedIn() ? $('.num').html(Pos.filter(function(model) {
-      return model.get("approved") === null;
-    }).length) : void 0);
     App.Router = new AppRouter();
     return MainView = new App.View.App();
   });
